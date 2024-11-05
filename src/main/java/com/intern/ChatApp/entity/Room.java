@@ -1,5 +1,6 @@
 package com.intern.ChatApp.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -19,6 +20,7 @@ public class Room {
 
     @ManyToOne
     @JoinColumn(name = "created_by_moderate_user_id")
+    @JsonIgnore
     private User createdBy;
 
     @Column(nullable = false, updatable = false)
