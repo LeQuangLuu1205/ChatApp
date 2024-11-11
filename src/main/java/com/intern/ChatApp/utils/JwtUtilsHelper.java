@@ -96,4 +96,17 @@ public class JwtUtilsHelper {
 
         return true;
     }
+
+    public Boolean validateToken(String token) {
+        final String username = extractUsername(token);
+
+        Claims claims = extractAllClaims(token);
+
+        String tokenId = claims.getId();
+        if (invalidatedTokenRepository.existsById(tokenId)) {
+            return false;
+        }
+
+        return true;
+    }
 }
