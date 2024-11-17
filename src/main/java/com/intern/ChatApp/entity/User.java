@@ -28,6 +28,8 @@ public class User implements UserDetails {
 
     private String name;
 
+    private String imagePath;
+
     @Column(length = 10)
     private String status = "active";
 

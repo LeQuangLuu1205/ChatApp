@@ -13,6 +13,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+
+import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
@@ -37,11 +40,18 @@ public class CustomFilterSecurity {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.cors(AbstractHttpConfigurer::disable)
+        http.cors(cors -> cors.configurationSource(request -> {
+                    CorsConfiguration configuration = new CorsConfiguration();
+                    configuration.setAllowedOrigins(Arrays.asList("http://127.0.0.1:5500","http://localhost:5500"));
+                    configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
+                    configuration.setAllowedHeaders(Arrays.asList("*"));
+                    configuration.setAllowCredentials(true);;
+                    return configuration;
+                }))
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session ->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/auth/**","/ws/**","/uploads/**").permitAll()
                         .requestMatchers("/api/rooms/**").hasAnyRole("ADMIN", "MODERATOR")
                         .requestMatchers("/api/users/**").hasAnyRole("ADMIN","MODERATOR","NORMAL")
                         .requestMatchers("/api/messages/**").hasAnyRole("ADMIN","MODERATOR","NORMAL")
