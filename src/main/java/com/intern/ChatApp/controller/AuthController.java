@@ -27,11 +27,6 @@ public class AuthController {
                 .build();
     }
 
-    @GetMapping("/test")
-    public String Test(){
-        return "Hello";
-    }
-
     @GetMapping("/verify")
     public ApiResponse<String> verifyUser(@RequestParam String email) {
         return authService.verifyUser(email);

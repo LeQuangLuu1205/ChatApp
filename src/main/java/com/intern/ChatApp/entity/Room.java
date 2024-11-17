@@ -20,7 +20,6 @@ public class Room {
 
     @ManyToOne
     @JoinColumn(name = "created_by_moderate_user_id")
-    @JsonIgnore
     private User createdBy;
 
     @Column(nullable = false, updatable = false)
