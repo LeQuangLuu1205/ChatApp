@@ -9,6 +9,7 @@ import com.intern.ChatApp.service.AuthService;
 import com.intern.ChatApp.service.PasswordService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,6 +25,7 @@ public class AuthController {
     private PasswordService passwordService;
     @PostMapping("/register")
     public ApiResponse<UserResponse> registerUser(@RequestBody @Valid RegisterRequest request) {
+
         return ApiResponse.<UserResponse>builder()
                 .result(authService.registerUser(request))
                 .build();
@@ -31,24 +33,28 @@ public class AuthController {
 
     @GetMapping("/verify")
     public ApiResponse<String> verifyUser(@RequestParam String email) {
+
         return authService.verifyUser(email);
     }
 
     @PostMapping("/login")
     public ApiResponse<?> login(@Valid @RequestBody LoginRequest request) {
         var result = authService.authenticateUser(request);
+
         return ApiResponse.<AuthenticationResponse>builder().result(result).build();
     }
 
     @PostMapping("/introspect")
     ApiResponse<IntrospectResponse> authenticate(@RequestBody IntrospectRequest request) {
         var result = authService.introspect(request);
+
         return ApiResponse.<IntrospectResponse>builder().result(result).build();
     }
 
     @PostMapping("/logout")
     ApiResponse<Void> logout(@RequestBody LogoutRequest request) {
         authService.logout(request);
+
         return ApiResponse.<Void>builder().build();
     }
 
@@ -62,5 +68,21 @@ public class AuthController {
                 .build();
 
         return ResponseEntity.ok(response);
+    }
+
+
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<ApiResponse<String>> resetPassword(@RequestBody ResetPasswordRequest request) {
+        // Gọi service để xử lý logic đặt lại mật khẩu
+        String result = passwordService.resetPassword(request.getToken(), request.getNewPassword());
+
+        // Tạo phản hồi
+        return ResponseEntity.ok(
+                ApiResponse.<String>builder()
+                        .result(result)
+                        .message("Password has been reset successfully")
+                        .build()
+        );
     }
 }

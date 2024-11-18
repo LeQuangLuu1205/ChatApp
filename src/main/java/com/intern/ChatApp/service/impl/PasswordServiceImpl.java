@@ -12,6 +12,7 @@ import com.intern.ChatApp.service.PasswordService;
 import org.apache.kafka.common.errors.ApiException;
 import org.apache.kafka.common.errors.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -27,23 +28,23 @@ public class PasswordServiceImpl implements PasswordService {
     @Autowired
     private EmailService emailService;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @Override
     public String initiatePasswordReset(String email) {
-        // 1. Tìm user theo email
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
 
-        // 2. Tạo token reset mật khẩu
         String resetTokenValue = UUID.randomUUID().toString();
         ResetToken resetToken = new ResetToken();
         resetToken.setUser(user);
         resetToken.setToken(resetTokenValue);
-        resetToken.setExpiresAt(LocalDateTime.now().plusHours(1));
+        resetToken.setExpiresAt(LocalDateTime.now().plusHours(5));
         resetTokenRepository.save(resetToken);
 
-        // 3. Gửi email với đường dẫn reset
-        String resetLink = "https://your-app.com/reset-password?token=" + resetTokenValue;
+        String resetLink = "http://127.0.0.1:5500/reset-password.html?token=" + resetTokenValue;
         emailService.sendEmail(
                 user.getEmail(),
                 "Password Reset Request",
@@ -53,9 +54,23 @@ public class PasswordServiceImpl implements PasswordService {
         return "Reset link has been sent to email: " + email;
     }
 
-
     @Override
-    public ApiResponse<String> resetPassword(String token, String newPassword) {
-        return null;
+    public String resetPassword(String token, String newPassword) {
+        ResetToken resetToken = resetTokenRepository.findByToken(token)
+                .orElseThrow(() -> new ResourceNotFoundException("Invalid or expired token"));
+
+        if (resetToken.getExpiresAt().isBefore(LocalDateTime.now())) {
+            resetTokenRepository.deleteByToken(token);
+            throw new IllegalArgumentException("Token has expired");
+        }
+
+        User user = resetToken.getUser();
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        resetTokenRepository.delete(resetToken);
+
+        return  "Password reset successfully for user: " + user.getEmail();
     }
+
 }
