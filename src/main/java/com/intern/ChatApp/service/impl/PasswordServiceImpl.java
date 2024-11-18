@@ -33,21 +33,18 @@ public class PasswordServiceImpl implements PasswordService {
 
     @Override
     public String initiatePasswordReset(String email) {
-        // 1. Tìm user theo email
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
 
-        // 2. Tạo token reset mật khẩu
         String resetTokenValue = UUID.randomUUID().toString();
         ResetToken resetToken = new ResetToken();
         resetToken.setUser(user);
         resetToken.setToken(resetTokenValue);
-        resetToken.setExpiresAt(LocalDateTime.now().plusHours(1));
+        resetToken.setExpiresAt(LocalDateTime.now().plusHours(5));
         resetTokenRepository.save(resetToken);
 
-        // 3. Gửi email với đường dẫn reset
-        String resetLink = "https://your-app.com/reset-password?token=" + resetTokenValue;
+        String resetLink = "http://127.0.0.1:5500/reset-password.html?token=" + resetTokenValue;
         emailService.sendEmail(
                 user.getEmail(),
                 "Password Reset Request",
@@ -59,22 +56,18 @@ public class PasswordServiceImpl implements PasswordService {
 
     @Override
     public String resetPassword(String token, String newPassword) {
-        // 1. Tìm ResetToken theo token
         ResetToken resetToken = resetTokenRepository.findByToken(token)
                 .orElseThrow(() -> new ResourceNotFoundException("Invalid or expired token"));
 
-        // 2. Kiểm tra token đã hết hạn
         if (resetToken.getExpiresAt().isBefore(LocalDateTime.now())) {
-            resetTokenRepository.deleteByToken(token); // Xóa token đã hết hạn
+            resetTokenRepository.deleteByToken(token);
             throw new IllegalArgumentException("Token has expired");
         }
 
-        // 3. Đặt lại mật khẩu mới
         User user = resetToken.getUser();
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
 
-        // 4. Xóa token sau khi sử dụng
         resetTokenRepository.delete(resetToken);
 
         return  "Password reset successfully for user: " + user.getEmail();
