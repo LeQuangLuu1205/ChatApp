@@ -17,6 +17,7 @@ public enum ErrorCode {
     INVALID_CREDENTIALS(1005, "Invalid credentials", HttpStatus.UNAUTHORIZED),
     ROLE_NOT_FOUND(1006,"Role not found",HttpStatus.BAD_REQUEST),
     UNAUTHENTICATED(1007, "Unauthenticated", HttpStatus.UNAUTHORIZED),
+    USER_NOT_FOUND(1008, "User not found", HttpStatus.BAD_REQUEST),
     // Mã cho xác minh email
     VERIFY_SUCCESS(1020, "Email verified successfully", HttpStatus.OK),
     INVALID_VERIFICATION_LINK(1021, "Invalid verification link", HttpStatus.BAD_REQUEST);

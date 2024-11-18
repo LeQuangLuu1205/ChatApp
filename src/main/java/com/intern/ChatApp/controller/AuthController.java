@@ -1,16 +1,15 @@
 package com.intern.ChatApp.controller;
 
-import com.intern.ChatApp.dto.request.IntrospectRequest;
-import com.intern.ChatApp.dto.request.LoginRequest;
-import com.intern.ChatApp.dto.request.LogoutRequest;
-import com.intern.ChatApp.dto.request.RegisterRequest;
+import com.intern.ChatApp.dto.request.*;
 import com.intern.ChatApp.dto.response.ApiResponse;
 import com.intern.ChatApp.dto.response.AuthenticationResponse;
 import com.intern.ChatApp.dto.response.IntrospectResponse;
 import com.intern.ChatApp.dto.response.UserResponse;
 import com.intern.ChatApp.service.AuthService;
+import com.intern.ChatApp.service.PasswordService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
@@ -20,6 +19,9 @@ import java.text.ParseException;
 public class AuthController {
     @Autowired
     private AuthService authService;
+
+    @Autowired
+    private PasswordService passwordService;
     @PostMapping("/register")
     public ApiResponse<UserResponse> registerUser(@RequestBody @Valid RegisterRequest request) {
         return ApiResponse.<UserResponse>builder()
@@ -50,4 +52,15 @@ public class AuthController {
         return ApiResponse.<Void>builder().build();
     }
 
+    @PostMapping("/forgot-password")
+    public ResponseEntity<ApiResponse<String>> forgotPassword(@RequestBody ForgotPasswordRequest request) {
+        String result = passwordService.initiatePasswordReset(request.getEmail());
+
+        ApiResponse<String> response = ApiResponse.<String>builder()
+                .result(result)
+                .message("Password reset link sent successfully")
+                .build();
+
+        return ResponseEntity.ok(response);
+    }
 }
