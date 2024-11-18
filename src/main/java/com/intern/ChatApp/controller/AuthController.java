@@ -63,4 +63,18 @@ public class AuthController {
 
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<ApiResponse<String>> resetPassword(@RequestBody ResetPasswordRequest request) {
+        // Gọi service để xử lý logic đặt lại mật khẩu
+        String result = passwordService.resetPassword(request.getToken(), request.getNewPassword());
+
+        // Tạo phản hồi
+        return ResponseEntity.ok(
+                ApiResponse.<String>builder()
+                        .result(result)
+                        .message("Password has been reset successfully")
+                        .build()
+        );
+    }
 }

@@ -12,6 +12,7 @@ import com.intern.ChatApp.service.PasswordService;
 import org.apache.kafka.common.errors.ApiException;
 import org.apache.kafka.common.errors.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -26,6 +27,9 @@ public class PasswordServiceImpl implements PasswordService {
 
     @Autowired
     private EmailService emailService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Override
     public String initiatePasswordReset(String email) {
@@ -53,9 +57,27 @@ public class PasswordServiceImpl implements PasswordService {
         return "Reset link has been sent to email: " + email;
     }
 
-
     @Override
-    public ApiResponse<String> resetPassword(String token, String newPassword) {
-        return null;
+    public String resetPassword(String token, String newPassword) {
+        // 1. Tìm ResetToken theo token
+        ResetToken resetToken = resetTokenRepository.findByToken(token)
+                .orElseThrow(() -> new ResourceNotFoundException("Invalid or expired token"));
+
+        // 2. Kiểm tra token đã hết hạn
+        if (resetToken.getExpiresAt().isBefore(LocalDateTime.now())) {
+            resetTokenRepository.deleteByToken(token); // Xóa token đã hết hạn
+            throw new IllegalArgumentException("Token has expired");
+        }
+
+        // 3. Đặt lại mật khẩu mới
+        User user = resetToken.getUser();
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        // 4. Xóa token sau khi sử dụng
+        resetTokenRepository.delete(resetToken);
+
+        return  "Password reset successfully for user: " + user.getEmail();
     }
+
 }
