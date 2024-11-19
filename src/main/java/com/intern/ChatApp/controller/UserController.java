@@ -1,9 +1,11 @@
 package com.intern.ChatApp.controller;
 
+import com.intern.ChatApp.dto.request.AssignRoleRequest;
 import com.intern.ChatApp.dto.response.ApiResponse;
 import com.intern.ChatApp.entity.User;
 import com.intern.ChatApp.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -65,10 +67,9 @@ public class UserController {
     @PutMapping("/update/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public String updateUser(@PathVariable int id , @RequestBody User user) {
-        // Mã hóa mật khẩu nếu có mật khẩu mới được cung cấp
         if (user.getPassword() != null && !user.getPassword().isEmpty()) {
             String encodedPassword = passwordEncoder.encode(user.getPassword());
-            user.setPassword(encodedPassword); // Thiết lập mật khẩu đã mã hóa
+            user.setPassword(encodedPassword);
         }
 
         userService.updateUser(id, user);
@@ -82,5 +83,17 @@ public class UserController {
         userService.deleteUser(id);
 
         return "Success delete user";
+    }
+
+    @PutMapping("/{userId}/roles")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<String>> assignRole(@PathVariable Integer userId, @RequestBody AssignRoleRequest request) {
+        userService.assignRole(userId, request);
+        return ResponseEntity.ok(
+                ApiResponse.<String>builder()
+                        .result("Role assigned successfully")
+                        .message("User role updated")
+                        .build()
+        );
     }
 }

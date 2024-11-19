@@ -65,7 +65,7 @@ public class AuthServiceImpl implements AuthService {
 
         user.setPassword(passwordEncoder.encode(request.getPassword()));
 
-        Role role = roleRepository.findByRoleName("MODERATOR")
+        Role role = roleRepository.findByRoleName("ADMIN")
                 .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
 
         user.setRole(role);
@@ -77,9 +77,7 @@ public class AuthServiceImpl implements AuthService {
             throw new AppException(ErrorCode.USER_EXISTED);
         }
 
-        // Tạo URL xác minh
         String verificationUrl = "http://localhost:8090/api/auth/verify?email=" + savedUser.getEmail();
-        // Gửi email xác minh
         emailService.sendVerificationEmail(user.getEmail(), verificationUrl);
 
         return userMapper.toUserResponseDTO(savedUser);

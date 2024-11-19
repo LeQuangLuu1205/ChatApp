@@ -18,7 +18,8 @@ public enum ErrorCode {
     ROLE_NOT_FOUND(1006,"Role not found",HttpStatus.BAD_REQUEST),
     UNAUTHENTICATED(1007, "Unauthenticated", HttpStatus.UNAUTHORIZED),
     USER_NOT_FOUND(1008, "User not found", HttpStatus.BAD_REQUEST),
-    INVALID_TOKEN(1008, "Invalid token", HttpStatus.BAD_REQUEST),
+    INVALID_TOKEN(1009, "Invalid token", HttpStatus.BAD_REQUEST),
+    INVALID_INPUT(1010, "Invalid input", HttpStatus.BAD_REQUEST),
     // Mã cho xác minh email
     VERIFY_SUCCESS(1020, "Email verified successfully", HttpStatus.OK),
     INVALID_VERIFICATION_LINK(1021, "Invalid verification link", HttpStatus.BAD_REQUEST);
