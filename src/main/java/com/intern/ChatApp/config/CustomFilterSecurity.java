@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -19,6 +20,7 @@ import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class CustomFilterSecurity {
 
     @Autowired
@@ -53,7 +55,6 @@ public class CustomFilterSecurity {
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/api/auth/**","/ws/**","/uploads/**").permitAll()
                         .requestMatchers("/api/rooms/**").hasAnyRole("ADMIN", "MODERATOR")
-                        .requestMatchers("/api/users/{userId}/roles").hasRole("ADMIN")
                         .requestMatchers("/api/users/**").hasAnyRole("ADMIN","MODERATOR","NORMAL")
                         .requestMatchers("/api/messages/**").hasAnyRole("ADMIN","MODERATOR","NORMAL")
                         .anyRequest().authenticated());
