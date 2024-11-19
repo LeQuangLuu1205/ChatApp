@@ -53,6 +53,7 @@ public class CustomFilterSecurity {
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/api/auth/**","/ws/**","/uploads/**").permitAll()
                         .requestMatchers("/api/rooms/**").hasAnyRole("ADMIN", "MODERATOR")
+                        .requestMatchers("/api/users/{userId}/roles").hasRole("ADMIN")
                         .requestMatchers("/api/users/**").hasAnyRole("ADMIN","MODERATOR","NORMAL")
                         .requestMatchers("/api/messages/**").hasAnyRole("ADMIN","MODERATOR","NORMAL")
                         .anyRequest().authenticated());
