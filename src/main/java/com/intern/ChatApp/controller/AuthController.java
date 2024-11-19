@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
@@ -82,6 +83,19 @@ public class AuthController {
                 ApiResponse.<String>builder()
                         .result(result)
                         .message("Password has been reset successfully")
+                        .build()
+        );
+    }
+
+
+    @PreAuthorize("hasAnyRole('ADMIN', 'NORMAL', 'MODERATOR')")
+    @PutMapping("/change-password")
+    public ResponseEntity<ApiResponse<String>> changePassword(@RequestBody ChangePasswordRequest request) {
+        passwordService.changePassword(request);
+        return ResponseEntity.ok(
+                ApiResponse.<String>builder()
+                        .result("Password changed successfully")
+                        .message("Password updated")
                         .build()
         );
     }

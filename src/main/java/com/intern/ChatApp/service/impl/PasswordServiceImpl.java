@@ -1,5 +1,6 @@
 package com.intern.ChatApp.service.impl;
 
+import com.intern.ChatApp.dto.request.ChangePasswordRequest;
 import com.intern.ChatApp.dto.response.ApiResponse;
 import com.intern.ChatApp.entity.ResetToken;
 import com.intern.ChatApp.entity.User;
@@ -9,6 +10,7 @@ import com.intern.ChatApp.repository.ResetTokenRepository;
 import com.intern.ChatApp.repository.UserRepository;
 import com.intern.ChatApp.service.EmailService;
 import com.intern.ChatApp.service.PasswordService;
+import com.intern.ChatApp.utils.SecurityUtil;
 import org.apache.kafka.common.errors.ApiException;
 import org.apache.kafka.common.errors.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +32,9 @@ public class PasswordServiceImpl implements PasswordService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private SecurityUtil securityUtil;
 
     @Override
     public String initiatePasswordReset(String email) {
@@ -73,4 +78,19 @@ public class PasswordServiceImpl implements PasswordService {
         return  "Password reset successfully for user: " + user.getEmail();
     }
 
+    @Override
+    public void changePassword(ChangePasswordRequest request) {
+        String email = securityUtil.extractEmailFromSecurityContext();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
+            throw new AppException(ErrorCode.INVALID_CREDENTIALS);
+        }
+
+
+        // 4. Update and save the new password
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+    }
 }
