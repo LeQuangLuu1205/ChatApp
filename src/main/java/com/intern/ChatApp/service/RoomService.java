@@ -1,5 +1,6 @@
 package com.intern.ChatApp.service;
 
+import com.intern.ChatApp.dto.request.AddUserToRoomRequest;
 import com.intern.ChatApp.dto.request.CreateRoomRequest;
 import com.intern.ChatApp.dto.response.RoomResponse;
 import com.intern.ChatApp.entity.Room;
@@ -13,4 +14,5 @@ public interface RoomService {
     void updateRoom(Integer id, Room room);
     void deleteRoom(Integer id);
     RoomResponse createRoomWithMembers(CreateRoomRequest request);
+    RoomResponse addUserToRoom(AddUserToRoomRequest request);
 }

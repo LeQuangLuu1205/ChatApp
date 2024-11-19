@@ -1,5 +1,6 @@
 package com.intern.ChatApp.controller;
 
+import com.intern.ChatApp.dto.request.AddUserToRoomRequest;
 import com.intern.ChatApp.dto.request.CreateRoomRequest;
 import com.intern.ChatApp.dto.response.ApiResponse;
 import com.intern.ChatApp.dto.response.RoomResponse;
@@ -35,6 +36,15 @@ public class RoomController {
                         .message("Room created successfully with members")
                         .build()
         );
+    }
+
+    @PostMapping("/add-user")
+    public ResponseEntity<ApiResponse<RoomResponse>> addUserToRoom(@RequestBody AddUserToRoomRequest request) {
+        RoomResponse roomResponse = roomService.addUserToRoom(request);
+        return ResponseEntity.ok(ApiResponse.<RoomResponse>builder()
+                .result(roomResponse)
+                .message("User added to room successfully")
+                .build());
     }
 
     @GetMapping("/getAll")

@@ -1,5 +1,6 @@
 package com.intern.ChatApp.service.impl;
 
+import com.intern.ChatApp.dto.request.AddUserToRoomRequest;
 import com.intern.ChatApp.dto.request.CreateRoomRequest;
 import com.intern.ChatApp.dto.response.RoomResponse;
 import com.intern.ChatApp.entity.Room;
@@ -21,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -142,6 +144,38 @@ public class RoomServiceImpl implements RoomService {
 
     // Phương thức xây dựng response
     private RoomResponse buildRoomResponse(Room room) {
+        return RoomResponse.builder()
+                .id(room.getId())
+                .name(room.getName())
+                .createdByEmail(room.getCreatedBy().getEmail())
+                .build();
+    }
+
+    @Override
+    @Transactional
+    public RoomResponse addUserToRoom(AddUserToRoomRequest request) {
+        // Lấy room theo roomId
+        Room room = roomRepository.findById(request.getRoomId())
+                .orElseThrow(() -> new AppException(ErrorCode.ROOM_NOT_FOUND));
+
+        // Tìm user theo email
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        // Kiểm tra nếu user đã là thành viên của room rồi
+        Optional<RoomUser> existingRoomUser = roomUserRepository.findByRoomAndUser(room, user);
+        if (existingRoomUser.isPresent()) {
+            throw new AppException(ErrorCode.USER_ALREADY_IN_ROOM);
+        }
+
+        // Tạo và lưu RoomUser mới
+        RoomUser roomUser = new RoomUser();
+        roomUser.setRoom(room);
+        roomUser.setUser(user);
+        roomUser.setId(new RoomUserId(room.getId(), user.getId()));
+        roomUserRepository.save(roomUser);
+
+        // Trả về thông tin phòng sau khi thêm người dùng
         return RoomResponse.builder()
                 .id(room.getId())
                 .name(room.getName())
