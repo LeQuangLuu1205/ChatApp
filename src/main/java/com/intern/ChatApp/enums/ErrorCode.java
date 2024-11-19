@@ -20,6 +20,7 @@ public enum ErrorCode {
     USER_NOT_FOUND(1008, "User not found", HttpStatus.BAD_REQUEST),
     INVALID_TOKEN(1009, "Invalid token", HttpStatus.BAD_REQUEST),
     INVALID_INPUT(1010, "Invalid input", HttpStatus.BAD_REQUEST),
+    DATABASE_ERROR(1010, "Error while saving room users", HttpStatus.BAD_REQUEST),
     // Mã cho xác minh email
     VERIFY_SUCCESS(1020, "Email verified successfully", HttpStatus.OK),
     INVALID_VERIFICATION_LINK(1021, "Invalid verification link", HttpStatus.BAD_REQUEST);

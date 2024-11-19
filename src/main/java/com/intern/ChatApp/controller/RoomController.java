@@ -1,12 +1,15 @@
 package com.intern.ChatApp.controller;
 
+import com.intern.ChatApp.dto.request.CreateRoomRequest;
 import com.intern.ChatApp.dto.response.ApiResponse;
+import com.intern.ChatApp.dto.response.RoomResponse;
 import com.intern.ChatApp.entity.Room;
 import com.intern.ChatApp.service.RoomService;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.intern.ChatApp.entity.User;
 import com.intern.ChatApp.utils.SecurityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,6 +26,17 @@ public class RoomController {
     private RoomService roomService;
     @Autowired
     private SecurityUtil securityUtil;
+    @PostMapping
+    public ResponseEntity<ApiResponse<RoomResponse>> createRoomWithMembers(@RequestBody CreateRoomRequest request) {
+        RoomResponse room = roomService.createRoomWithMembers(request);
+        return ResponseEntity.ok(
+                ApiResponse.<RoomResponse>builder()
+                        .result(room)
+                        .message("Room created successfully with members")
+                        .build()
+        );
+    }
+
     @GetMapping("/getAll")
     @PreAuthorize("hasRole('MODERATOR')")
     public ApiResponse<?> getAllRoom() {
