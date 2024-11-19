@@ -2,11 +2,15 @@ package com.intern.ChatApp.entity;
 
 import com.intern.ChatApp.entity.keys.RoomUserId;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
 @Data
 @Table(name = "room_users")
 public class RoomUser {
@@ -26,5 +30,6 @@ public class RoomUser {
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime joinedAt = LocalDateTime.now();
+
 
 }
