@@ -2,6 +2,7 @@ package com.intern.ChatApp.controller;
 
 import com.intern.ChatApp.dto.request.AddUserToRoomRequest;
 import com.intern.ChatApp.dto.request.CreateRoomRequest;
+import com.intern.ChatApp.dto.request.RemoveUserFromRoomRequest;
 import com.intern.ChatApp.dto.response.ApiResponse;
 import com.intern.ChatApp.dto.response.RoomResponse;
 import com.intern.ChatApp.entity.Room;
@@ -44,6 +45,15 @@ public class RoomController {
         return ResponseEntity.ok(ApiResponse.<RoomResponse>builder()
                 .result(roomResponse)
                 .message("User added to room successfully")
+                .build());
+    }
+
+    @PostMapping("/remove-user")
+    public ResponseEntity<ApiResponse<RoomResponse>> removeUserFromRoom(@RequestBody RemoveUserFromRoomRequest request) {
+        RoomResponse roomResponse = roomService.removeUserFromRoom(request);
+        return ResponseEntity.ok(ApiResponse.<RoomResponse>builder()
+                .result(roomResponse)
+                .message("User removed from room successfully")
                 .build());
     }
 

@@ -23,6 +23,7 @@ public enum ErrorCode {
     DATABASE_ERROR(1011, "Error while saving room users", HttpStatus.BAD_REQUEST),
     ROOM_NOT_FOUND(1012, "Room not found", HttpStatus.BAD_REQUEST),
     USER_ALREADY_IN_ROOM(1013, "User already in room", HttpStatus.BAD_REQUEST),
+    USER_NOT_IN_ROOM(1014, "User not in room", HttpStatus.BAD_REQUEST),
     // Mã cho xác minh email
     VERIFY_SUCCESS(1020, "Email verified successfully", HttpStatus.OK),
     INVALID_VERIFICATION_LINK(1021, "Invalid verification link", HttpStatus.BAD_REQUEST);
