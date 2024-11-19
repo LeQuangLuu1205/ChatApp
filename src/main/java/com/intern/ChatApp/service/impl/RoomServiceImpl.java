@@ -24,14 +24,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-
 public class RoomServiceImpl implements RoomService {
     @Autowired
     private RoomRepository roomRepository;
-
     @Autowired
     private SecurityUtil securityUtil;
-
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -107,6 +104,7 @@ public class RoomServiceImpl implements RoomService {
         Room room = new Room();
         room.setName(request.getName());
         room.setCreatedBy(createBy);
+
         return roomRepository.save(room);
     }
 
@@ -133,7 +131,6 @@ public class RoomServiceImpl implements RoomService {
 
         return roomUsers;
     }
-
 
     private void saveRoomUsers(List<RoomUser> roomUsers) {
         try {

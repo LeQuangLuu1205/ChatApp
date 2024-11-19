@@ -8,14 +8,9 @@ import java.util.List;
 
 public interface RoomService {
     void addRoom(Room room);
-
     List<Room> getRooms();
-
     Room getRoom(Integer id);
-
     void updateRoom(Integer id, Room room);
-
     void deleteRoom(Integer id);
-
     RoomResponse createRoomWithMembers(CreateRoomRequest request);
 }
