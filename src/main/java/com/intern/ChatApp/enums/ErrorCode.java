@@ -25,6 +25,7 @@ public enum ErrorCode {
     USER_ALREADY_IN_ROOM(1013, "User already in room", HttpStatus.BAD_REQUEST),
     USER_NOT_IN_ROOM(1014, "User not in room", HttpStatus.BAD_REQUEST),
     UNAUTHORIZED(1015, "Unauthorized", HttpStatus.BAD_REQUEST),
+    UNVERIFIED_ACCOUNT(1016, "UNVERIFIED_ACCOUNT", HttpStatus.BAD_REQUEST),
     // Mã cho xác minh email
     VERIFY_SUCCESS(1020, "Email verified successfully", HttpStatus.OK),
     INVALID_VERIFICATION_LINK(1021, "Invalid verification link", HttpStatus.BAD_REQUEST);
