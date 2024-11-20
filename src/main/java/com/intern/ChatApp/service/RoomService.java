@@ -3,6 +3,7 @@ package com.intern.ChatApp.service;
 import com.intern.ChatApp.dto.request.AddUserToRoomRequest;
 import com.intern.ChatApp.dto.request.CreateRoomRequest;
 import com.intern.ChatApp.dto.request.RemoveUserFromRoomRequest;
+import com.intern.ChatApp.dto.request.UpdateRoomRequest;
 import com.intern.ChatApp.dto.response.RoomResponse;
 import com.intern.ChatApp.entity.Room;
 
@@ -17,4 +18,5 @@ public interface RoomService {
     RoomResponse createRoomWithMembers(CreateRoomRequest request);
     RoomResponse addUserToRoom(AddUserToRoomRequest request);
     RoomResponse removeUserFromRoom(RemoveUserFromRoomRequest request);
+    RoomResponse updateRoomName(Integer roomId, UpdateRoomRequest request);
 }
