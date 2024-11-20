@@ -2,6 +2,7 @@ package com.intern.ChatApp.service.impl;
 
 import com.intern.ChatApp.dto.request.AddUserToRoomRequest;
 import com.intern.ChatApp.dto.request.CreateRoomRequest;
+import com.intern.ChatApp.dto.request.RemoveUserFromRoomRequest;
 import com.intern.ChatApp.dto.response.RoomResponse;
 import com.intern.ChatApp.entity.Room;
 import com.intern.ChatApp.entity.RoomUser;
@@ -154,28 +155,59 @@ public class RoomServiceImpl implements RoomService {
     @Override
     @Transactional
     public RoomResponse addUserToRoom(AddUserToRoomRequest request) {
-        // Lấy room theo roomId
         Room room = roomRepository.findById(request.getRoomId())
                 .orElseThrow(() -> new AppException(ErrorCode.ROOM_NOT_FOUND));
 
-        // Tìm user theo email
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
-        // Kiểm tra nếu user đã là thành viên của room rồi
         Optional<RoomUser> existingRoomUser = roomUserRepository.findByRoomAndUser(room, user);
         if (existingRoomUser.isPresent()) {
             throw new AppException(ErrorCode.USER_ALREADY_IN_ROOM);
         }
 
-        // Tạo và lưu RoomUser mới
         RoomUser roomUser = new RoomUser();
         roomUser.setRoom(room);
         roomUser.setUser(user);
         roomUser.setId(new RoomUserId(room.getId(), user.getId()));
         roomUserRepository.save(roomUser);
 
-        // Trả về thông tin phòng sau khi thêm người dùng
+        return RoomResponse.builder()
+                .id(room.getId())
+                .name(room.getName())
+                .createdByEmail(room.getCreatedBy().getEmail())
+                .build();
+    }
+
+    @Override
+    @Transactional
+    public RoomResponse removeUserFromRoom(RemoveUserFromRoomRequest request) {
+
+        // Lấy room theo roomId
+        Room room = roomRepository.findById(request.getRoomId())
+                .orElseThrow(() -> new AppException(ErrorCode.ROOM_NOT_FOUND));
+
+        // Lấy user hiện tại từ SecurityContext
+        String currentUserEmail = securityUtil.extractEmailFromSecurityContext();
+        User currentUser = userRepository.findByEmail(currentUserEmail)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        // Kiểm tra quyền của người yêu cầu (creator hoặc moderator)
+        RoomUser currentRoomUser = roomUserRepository.findByRoomAndUser(room, currentUser)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_IN_ROOM));
+
+
+        // Tìm user cần xóa theo email
+        User userToRemove = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        // Kiểm tra xem người dùng có phải là thành viên của room không
+        RoomUser roomUserToRemove = roomUserRepository.findByRoomAndUser(room, userToRemove)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_IN_ROOM));
+
+        // Xóa RoomUser
+        roomUserRepository.delete(roomUserToRemove);
+
         return RoomResponse.builder()
                 .id(room.getId())
                 .name(room.getName())
