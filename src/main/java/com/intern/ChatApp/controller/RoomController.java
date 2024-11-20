@@ -3,6 +3,7 @@ package com.intern.ChatApp.controller;
 import com.intern.ChatApp.dto.request.AddUserToRoomRequest;
 import com.intern.ChatApp.dto.request.CreateRoomRequest;
 import com.intern.ChatApp.dto.request.RemoveUserFromRoomRequest;
+import com.intern.ChatApp.dto.request.UpdateRoomRequest;
 import com.intern.ChatApp.dto.response.ApiResponse;
 import com.intern.ChatApp.dto.response.RoomResponse;
 import com.intern.ChatApp.entity.Room;
@@ -93,12 +94,17 @@ public class RoomController {
                 .result(room).build();
     }
 
-    @PutMapping("/update/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public String updateRoom(@PathVariable Integer id, @RequestBody Room room){
-        roomService.updateRoom(id, room);
+    @PutMapping("/{roomId}")
+    @PreAuthorize("hasRole('MODERATOR')")
+    public ResponseEntity<ApiResponse<RoomResponse>> updateRoomName(@PathVariable Integer roomId,
+                             @RequestBody UpdateRoomRequest request){
 
-        return "Success upadate room";
+        RoomResponse roomResponse = roomService.updateRoomName(roomId, request);
+
+        return ResponseEntity.ok(ApiResponse.<RoomResponse>builder()
+                .result(roomResponse)
+                .message("Room updated successfully")
+                .build());
     }
 
     @DeleteMapping("/delete/{id}")

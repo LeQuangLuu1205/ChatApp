@@ -3,6 +3,7 @@ package com.intern.ChatApp.service.impl;
 import com.intern.ChatApp.dto.request.AddUserToRoomRequest;
 import com.intern.ChatApp.dto.request.CreateRoomRequest;
 import com.intern.ChatApp.dto.request.RemoveUserFromRoomRequest;
+import com.intern.ChatApp.dto.request.UpdateRoomRequest;
 import com.intern.ChatApp.dto.response.RoomResponse;
 import com.intern.ChatApp.entity.Room;
 import com.intern.ChatApp.entity.RoomUser;
@@ -207,6 +208,33 @@ public class RoomServiceImpl implements RoomService {
 
         // Xóa RoomUser
         roomUserRepository.delete(roomUserToRemove);
+
+        return RoomResponse.builder()
+                .id(room.getId())
+                .name(room.getName())
+                .createdByEmail(room.getCreatedBy().getEmail())
+                .build();
+    }
+
+    @Override
+    @Transactional
+    public RoomResponse updateRoomName(Integer roomId, UpdateRoomRequest request) {
+
+        Room room = roomRepository.findById(roomId)
+                .orElseThrow(() -> new AppException(ErrorCode.ROOM_NOT_FOUND));
+
+        String email = securityUtil.extractEmailFromSecurityContext();
+
+        boolean isAdmin = userRepository.existsByEmailAndIsAdmin(email);
+        if (!isAdmin) {
+            boolean isMember = roomUserRepository.existsByRoomIdAndUserEmail(room.getId(), email);
+            if (!isMember) {
+                throw new AppException(ErrorCode.UNAUTHORIZED);
+            }
+        }
+
+        room.setName(request.getName());
+        roomRepository.save(room);
 
         return RoomResponse.builder()
                 .id(room.getId())
