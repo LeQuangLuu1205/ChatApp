@@ -110,6 +110,16 @@ public class AuthServiceImpl implements AuthService {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
             );
+
+            // Lấy thông tin user từ cơ sở dữ liệu
+            User user = userRepository.findByEmail(request.getEmail())
+                    .orElseThrow(() -> new AppException(ErrorCode.INVALID_CREDENTIALS));
+
+            // Kiểm tra trạng thái xác minh
+            if (!user.getIsVerified()) {
+                throw new AppException(ErrorCode.UNVERIFIED_ACCOUNT);
+            }
+
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
             var token = jwtUtils.generateToken(userDetails);
             return AuthenticationResponse.builder().token(token).authenticated(true).build();

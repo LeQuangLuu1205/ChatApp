@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.text.ParseException;
 
 @RestController
@@ -33,9 +34,12 @@ public class AuthController {
     }
 
     @GetMapping("/verify")
-    public ApiResponse<String> verifyUser(@RequestParam String email) {
+    public ResponseEntity<?> verifyUser(@RequestParam String email) {
 
-        return authService.verifyUser(email);
+        authService.verifyUser(email);
+        return ResponseEntity.status(HttpStatus.FOUND)
+                .location(URI.create("http://localhost:3000/login"))
+                .build();
     }
 
     @PostMapping("/login")
