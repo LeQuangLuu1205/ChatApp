@@ -1,12 +1,14 @@
 package com.intern.ChatApp.service;
 
 import com.intern.ChatApp.dto.request.AssignRoleRequest;
+import com.intern.ChatApp.dto.request.UserRequest;
+import com.intern.ChatApp.dto.response.UserResponse;
 import com.intern.ChatApp.entity.User;
 
 import java.util.List;
 
 public interface UserService {
-    void addUser(User user);
+    UserResponse addUser(UserRequest userRequest);
 
     List<User> getUser();
 

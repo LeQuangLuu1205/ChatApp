@@ -46,6 +46,9 @@ public class User implements UserDetails {
     @JoinColumn(name = "role_id")
     private Role role;
 
+
+
+
     @PreUpdate
     public void setLastUpdate() {
         this.updatedAt = LocalDateTime.now();

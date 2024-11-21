@@ -1,9 +1,12 @@
 package com.intern.ChatApp.controller;
 
 import com.intern.ChatApp.dto.request.AssignRoleRequest;
+import com.intern.ChatApp.dto.request.UserRequest;
 import com.intern.ChatApp.dto.response.ApiResponse;
+import com.intern.ChatApp.dto.response.UserResponse;
 import com.intern.ChatApp.entity.User;
 import com.intern.ChatApp.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -37,15 +40,15 @@ public class UserController {
             .build();
     }
 
-    @PostMapping("/add")
-    public String addUser(@RequestBody User user) {
-        // Mã hóa mật khẩu trước khi lưu
-        String encodedPassword = passwordEncoder.encode(user.getPassword());
-        user.setPassword(encodedPassword); // Thiết lập mật khẩu đã mã hóa
-
-        userService.addUser(user);
-
-        return "Success add user";
+    @PostMapping()
+    public ResponseEntity<ApiResponse<UserResponse>> addUser(@RequestBody @Valid UserRequest userRequest) {
+        UserResponse userResponse = userService.addUser(userRequest);
+        return ResponseEntity.ok(
+                ApiResponse.<UserResponse>builder()
+                        .message("User has been added successfully.")
+                        .result(userResponse)
+                        .build()
+        );
     }
 
     @GetMapping
