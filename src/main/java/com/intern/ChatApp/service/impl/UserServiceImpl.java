@@ -1,6 +1,8 @@
 package com.intern.ChatApp.service.impl;
 
 import com.intern.ChatApp.dto.request.AssignRoleRequest;
+import com.intern.ChatApp.dto.request.UserRequest;
+import com.intern.ChatApp.dto.response.UserResponse;
 import com.intern.ChatApp.entity.Role;
 import com.intern.ChatApp.entity.User;
 import com.intern.ChatApp.enums.ErrorCode;
@@ -9,6 +11,7 @@ import com.intern.ChatApp.repository.RoleRepository;
 import com.intern.ChatApp.repository.UserRepository;
 import com.intern.ChatApp.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 
 import java.util.List;
@@ -22,9 +25,33 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private RoleRepository roleRepository;
-    @Override
-    public void addUser(User user) {
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+
+    public UserResponse addUser(UserRequest userRequest) {
+
+        Role role = roleRepository.findById(userRequest.getRoleId())
+                .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
+
+        User user = new User();
+        user.setEmail(userRequest.getEmail());
+        user.setPassword(passwordEncoder.encode(userRequest.getPassword()));
+        user.setName(userRequest.getName());
+        user.setRole(role);
+
+        user = userRepository.save(user);
+
+        return UserResponse.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .name(user.getName())
+                .imagePath(user.getImagePath())
+                .createdAt(user.getCreatedAt())
+                .updatedAt(user.getUpdatedAt())
+                .role(user.getRole())
+                .build();
     }
 
     @Override
