@@ -45,11 +45,6 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-    public List<Room> getRooms() {
-        return roomRepository.findAll();
-    }
-
-    @Override
     public Room getRoom(Integer id) {
         Room room = roomRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid room id" + id));
@@ -252,5 +247,21 @@ public class RoomServiceImpl implements RoomService {
         room.setUpdatedAt(LocalDateTime.now());
 
         roomRepository.save(room);
+    }
+
+    public List<RoomResponse> getAllRooms() {
+        // Fetch only rooms that are not disabled
+        return roomRepository.findByIsDisabledFalse()
+                .stream()
+                .map(this::convertToRoomResponse)
+                .collect(Collectors.toList());
+    }
+
+    private RoomResponse convertToRoomResponse(Room room) {
+        return RoomResponse.builder()
+                .id(room.getId())
+                .name(room.getName())
+                .createdByEmail(room.getCreatedBy() != null ? room.getCreatedBy().getEmail() : null)
+                .build();
     }
 }

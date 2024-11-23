@@ -11,7 +11,6 @@ import java.util.List;
 
 public interface RoomService {
     void addRoom(Room room);
-    List<Room> getRooms();
     Room getRoom(Integer id);
     void updateRoom(Integer id, Room room);
     void deleteRoom(Integer id);
@@ -20,4 +19,5 @@ public interface RoomService {
     RoomResponse removeUserFromRoom(RemoveUserFromRoomRequest request);
     RoomResponse updateRoomName(Integer roomId, UpdateRoomRequest request);
     void disableRoom(Integer roomId);
+    List<RoomResponse> getAllRooms();
 }

@@ -30,6 +30,7 @@ public class RoomController {
     @Autowired
     private SecurityUtil securityUtil;
     @PostMapping
+    @PreAuthorize("hasAnyRole('MODERATOR','ADMIN')")
     public ResponseEntity<ApiResponse<RoomResponse>> createRoomWithMembers(@RequestBody CreateRoomRequest request) {
         RoomResponse room = roomService.createRoomWithMembers(request);
         return ResponseEntity.ok(
@@ -41,6 +42,7 @@ public class RoomController {
     }
 
     @PostMapping("/add-user")
+    @PreAuthorize("hasAnyRole('MODERATOR','ADMIN')")
     public ResponseEntity<ApiResponse<RoomResponse>> addUserToRoom(@RequestBody AddUserToRoomRequest request) {
         RoomResponse roomResponse = roomService.addUserToRoom(request);
         return ResponseEntity.ok(ApiResponse.<RoomResponse>builder()
@@ -50,6 +52,7 @@ public class RoomController {
     }
 
     @PostMapping("/remove-user")
+    @PreAuthorize("hasAnyRole('MODERATOR','ADMIN')")
     public ResponseEntity<ApiResponse<RoomResponse>> removeUserFromRoom(@RequestBody RemoveUserFromRoomRequest request) {
         RoomResponse roomResponse = roomService.removeUserFromRoom(request);
         return ResponseEntity.ok(ApiResponse.<RoomResponse>builder()
@@ -58,32 +61,26 @@ public class RoomController {
                 .build());
     }
 
-    @GetMapping("/getAll")
-    @PreAuthorize("hasRole('MODERATOR')")
-    public ApiResponse<?> getAllRoom() {
-        String email = securityUtil.extractEmailFromSecurityContext();
-        return ApiResponse.<String>builder()
-                .result(email)
-                .message("Email retrieved successfully")
-                .build();
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<RoomResponse>>> getAllRooms() {
+        List<RoomResponse> rooms = roomService.getAllRooms();
+        return ResponseEntity.ok(
+                ApiResponse.<List<RoomResponse>>builder()
+                        .code(1000)
+                        .message("Rooms retrieved successfully")
+                        .result(rooms)
+                        .build()
+        );
     }
 
     @PostMapping("/add")
-    //@PreAuthorize("hasRole('ADMIN')")
     public String addRoom(@RequestBody Room room){
         roomService.addRoom(room);
 
         return "Success add room";
     }
 
-    @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
-    public ApiResponse<?> getAllRooms(){
-        List<Room> rooms = roomService.getRooms();
-        return ApiResponse.builder()
-                .result(rooms)
-                .build();
-    }
+
 
     @GetMapping("/get")
     @PreAuthorize("hasRole('ADMIN')")
@@ -95,7 +92,7 @@ public class RoomController {
     }
 
     @PutMapping("/{roomId}")
-    @PreAuthorize("hasRole('MODERATOR')")
+    @PreAuthorize("hasAnyRole('MODERATOR','ADMIN')")
     public ResponseEntity<ApiResponse<RoomResponse>> updateRoomName(@PathVariable Integer roomId,
                              @RequestBody UpdateRoomRequest request){
 

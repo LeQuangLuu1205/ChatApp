@@ -54,7 +54,7 @@ public class CustomFilterSecurity {
                 .sessionManagement(session ->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/api/auth/**","/ws/**","/uploads/**").permitAll()
-                        .requestMatchers("/api/rooms/**").hasAnyRole("ADMIN", "MODERATOR")
+                        .requestMatchers("/api/rooms/**").hasAnyRole("ADMIN", "MODERATOR","NORMAL")
                         .requestMatchers("/api/users/**").hasAnyRole("ADMIN","MODERATOR","NORMAL")
                         .requestMatchers("/api/messages/**").hasAnyRole("ADMIN","MODERATOR","NORMAL")
                         .anyRequest().authenticated());
