@@ -1,6 +1,5 @@
 package com.intern.ChatApp.dto.response;
 
-import com.intern.ChatApp.entity.Role;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -18,5 +17,5 @@ public class UserResponse {
     private String imagePath;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private Role role;
+    private RoleResponse  roleResponse;
 }

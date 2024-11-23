@@ -2,6 +2,7 @@ package com.intern.ChatApp.service.impl;
 
 import com.intern.ChatApp.dto.request.AssignRoleRequest;
 import com.intern.ChatApp.dto.request.UserRequest;
+import com.intern.ChatApp.dto.response.RoleResponse;
 import com.intern.ChatApp.dto.response.UserResponse;
 import com.intern.ChatApp.entity.Role;
 import com.intern.ChatApp.entity.User;
@@ -13,9 +14,11 @@ import com.intern.ChatApp.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Controller
 public class UserServiceImpl implements UserService {
@@ -50,14 +53,38 @@ public class UserServiceImpl implements UserService {
                 .imagePath(user.getImagePath())
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt())
-                .role(user.getRole())
+                .roleResponse(new RoleResponse(
+                        user.getRole().getId()
+                        ,user.getRole().getRoleName()))
                 .build();
     }
 
+
+
     @Override
-    public List<User> getUser() {
-        return null;
+    @Transactional
+    public List<UserResponse> getAllUsers() {
+//        return null;
+        return userRepository.findAll()
+                .stream()
+                .map(this::convertToUserResponse)
+                .collect(Collectors.toList());
     }
+
+    private UserResponse convertToUserResponse(User user) {
+        return UserResponse.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .name(user.getName())
+                .imagePath(user.getImagePath())
+                .createdAt(user.getCreatedAt())
+                .updatedAt(user.getUpdatedAt())
+                .roleResponse(new RoleResponse(
+                        user.getRole().getId()
+                        ,user.getRole().getRoleName()))
+                .build();
+    }
+
 
     @Override
     public User getUser(int id) {

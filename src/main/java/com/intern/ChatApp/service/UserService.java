@@ -10,7 +10,7 @@ import java.util.List;
 public interface UserService {
     UserResponse addUser(UserRequest userRequest);
 
-    List<User> getUser();
+    List<UserResponse> getAllUsers();
 
     User getUser(int id);
 

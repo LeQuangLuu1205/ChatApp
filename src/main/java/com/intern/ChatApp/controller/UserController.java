@@ -24,21 +24,6 @@ public class UserController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @GetMapping("/getAll")
-    @PreAuthorize("hasRole('MODERATOR')")
-    public ApiResponse<?> getAllUsers() {
-        return ApiResponse.<String>builder()
-                .result("Hello")
-                .build();
-    }
-
-    @GetMapping("/getdemo")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ApiResponse<?> getDemoUsers() {
-        return ApiResponse.<String>builder()
-            .result("Hello")
-            .build();
-    }
 
     @PostMapping()
     public ResponseEntity<ApiResponse<UserResponse>> addUser(@RequestBody @Valid UserRequest userRequest) {
@@ -53,10 +38,14 @@ public class UserController {
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ApiResponse<?> getAllUser() {
-        List<User> users=userService.getUser();
-
-        return ApiResponse.builder().result(users).build();
+    public ResponseEntity<ApiResponse<List<UserResponse>>> getAllUsers() {
+        List<UserResponse> users = userService.getAllUsers();
+        return ResponseEntity.ok(
+                ApiResponse.<List<UserResponse>>builder()
+                        .message("User list fetched successfully.")
+                        .result(users)
+                        .build()
+        );
     }
 
     @GetMapping("/get")
