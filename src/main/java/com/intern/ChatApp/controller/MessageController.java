@@ -2,6 +2,7 @@ package com.intern.ChatApp.controller;
 
 import com.intern.ChatApp.dto.request.MessageRequest;
 import com.intern.ChatApp.dto.response.ApiResponse;
+import com.intern.ChatApp.dto.response.MessageResponse;
 import com.intern.ChatApp.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,18 @@ public class MessageController {
                 ApiResponse.<Void>builder()
                         .code(1000)
                         .message("Message disabled successfully")
+                        .build()
+        );
+    }
+
+    @PatchMapping("/{messageId}/pin")
+    public ResponseEntity<ApiResponse<MessageResponse>> pinMessage(@PathVariable Integer messageId) {
+        MessageResponse pinnedMessage = messageService.pinMessage(messageId);
+        return ResponseEntity.ok(
+                ApiResponse.<MessageResponse>builder()
+                        .code(1000)
+                        .message("Message pinned successfully")
+                        .result(pinnedMessage)
                         .build()
         );
     }

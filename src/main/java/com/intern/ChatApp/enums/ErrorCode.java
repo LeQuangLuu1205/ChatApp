@@ -28,6 +28,7 @@ public enum ErrorCode {
     UNVERIFIED_ACCOUNT(1016, "UNVERIFIED_ACCOUNT", HttpStatus.BAD_REQUEST),
     IMAGE_SAVE_FAILED(1017, "Failed to save image", HttpStatus.INTERNAL_SERVER_ERROR),
     MESSAGE_NOT_FOUND(1018, "Message not found",HttpStatus.BAD_REQUEST),
+    MESSAGE_DISABLED(1019, "Message is disabled",HttpStatus.BAD_REQUEST),
     // Mã cho xác minh email
     VERIFY_SUCCESS(1020, "Email verified successfully", HttpStatus.OK),
     INVALID_VERIFICATION_LINK(1021, "Invalid verification link", HttpStatus.BAD_REQUEST);
