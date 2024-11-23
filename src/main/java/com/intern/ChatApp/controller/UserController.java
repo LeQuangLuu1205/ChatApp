@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -89,5 +90,16 @@ public class UserController {
                         .message("User role updated")
                         .build()
         );
+    }
+    @PutMapping("/profile")
+    public ResponseEntity<ApiResponse<UserResponse>> updateProfile(
+            @RequestPart(value = "name", required = false) String name,
+            @RequestPart(value = "oldPassword", required = false) String oldPassword,
+            @RequestPart(value = "newPassword", required = false) String newPassword,
+            @RequestPart(value = "image", required = false) MultipartFile image) {
+
+        UserResponse updatedUser = userService.updateProfile(name, oldPassword, newPassword, image);
+
+        return ResponseEntity.ok(new ApiResponse<>(1000, "Profile updated successfully", updatedUser));
     }
 }
