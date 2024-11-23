@@ -19,4 +19,5 @@ public interface RoomService {
     RoomResponse addUserToRoom(AddUserToRoomRequest request);
     RoomResponse removeUserFromRoom(RemoveUserFromRoomRequest request);
     RoomResponse updateRoomName(Integer roomId, UpdateRoomRequest request);
+    void disableRoom(Integer roomId);
 }

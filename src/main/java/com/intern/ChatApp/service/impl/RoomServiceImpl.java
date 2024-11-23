@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -241,5 +242,15 @@ public class RoomServiceImpl implements RoomService {
                 .name(room.getName())
                 .createdByEmail(room.getCreatedBy().getEmail())
                 .build();
+    }
+
+    public void disableRoom(Integer roomId) {
+        Room room = roomRepository.findById(roomId)
+                .orElseThrow(() -> new AppException(ErrorCode.ROOM_NOT_FOUND));
+
+        room.setIsDisabled(!Boolean.TRUE.equals(room.getIsDisabled()));
+        room.setUpdatedAt(LocalDateTime.now());
+
+        roomRepository.save(room);
     }
 }
