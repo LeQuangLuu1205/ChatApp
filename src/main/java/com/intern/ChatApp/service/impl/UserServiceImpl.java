@@ -16,6 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -53,6 +54,7 @@ public class UserServiceImpl implements UserService {
                 .imagePath(user.getImagePath())
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt())
+                .isDisabled(user.getIsDisabled())
                 .roleResponse(new RoleResponse(
                         user.getRole().getId()
                         ,user.getRole().getRoleName()))
@@ -64,9 +66,9 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public List<UserResponse> getAllUsers() {
-//        return null;
         return userRepository.findAll()
                 .stream()
+                .filter(user -> Boolean.FALSE.equals(user.getIsDisabled())) // Lọc user không bị xóa
                 .map(this::convertToUserResponse)
                 .collect(Collectors.toList());
     }
@@ -79,6 +81,7 @@ public class UserServiceImpl implements UserService {
                 .imagePath(user.getImagePath())
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt())
+                .isDisabled(user.getIsDisabled())
                 .roleResponse(new RoleResponse(
                         user.getRole().getId()
                         ,user.getRole().getRoleName()))
@@ -91,10 +94,15 @@ public class UserServiceImpl implements UserService {
         return null;
     }
 
-    @Override
-    public void deleteUser(int id) {
+    public void disableUser(Integer userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
+        user.setIsDisabled(!user.getIsDisabled());
+        user.setUpdatedAt(LocalDateTime.now());
+        userRepository.save(user);
     }
+
 
     @Override
     public void updateUser(int id, User user) {

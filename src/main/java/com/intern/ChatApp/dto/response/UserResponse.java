@@ -17,5 +17,6 @@ public class UserResponse {
     private String imagePath;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private Boolean isDisabled;
     private RoleResponse  roleResponse;
 }
