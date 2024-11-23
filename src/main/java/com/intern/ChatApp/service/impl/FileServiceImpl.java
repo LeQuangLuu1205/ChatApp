@@ -1,9 +1,9 @@
 package com.intern.ChatApp.service.impl;
 
 import com.intern.ChatApp.enums.ErrorCode;
+import com.intern.ChatApp.exception.AppException;
 import com.intern.ChatApp.service.FileService;
 import jakarta.annotation.PostConstruct;
-import org.apache.kafka.common.errors.ApiException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -19,10 +19,9 @@ import java.nio.file.StandardCopyOption;
 
 @Service
 public class FileServiceImpl implements FileService {
-    @Value("${fileUpload.rootPath}")
+    @Value("${fileUpload.rootPath2}")
     private String rootPath;
     private Path root;
-
     @PostConstruct
     public void init() {
         try {
@@ -34,7 +33,6 @@ public class FileServiceImpl implements FileService {
             throw new RuntimeException("Could not initialize folder for upload!");
         }
     }
-
     @Override
     public String saveFile(MultipartFile file) {
         if (file.isEmpty()) {
@@ -43,10 +41,11 @@ public class FileServiceImpl implements FileService {
 
         try {
             String filename = file.getOriginalFilename();
-            Files.copy(file.getInputStream(), this.root.resolve(filename), StandardCopyOption.REPLACE_EXISTING);
-            return this.root.resolve(filename).toString();  // Trả về đường dẫn tệp đã lưu
+            Path targetPath = this.root.resolve(filename);
+            Files.copy(file.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
+            return filename; // Chỉ trả về tên file
         } catch (IOException e) {
-            return "Sai roi";
+            throw new RuntimeException("Could not save file: " + file.getOriginalFilename(), e);
         }
     }
 
@@ -64,4 +63,3 @@ public class FileServiceImpl implements FileService {
         }
     }
 }
-

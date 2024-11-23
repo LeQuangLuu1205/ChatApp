@@ -4,6 +4,7 @@ import com.intern.ChatApp.dto.request.AssignRoleRequest;
 import com.intern.ChatApp.dto.request.UserRequest;
 import com.intern.ChatApp.dto.response.UserResponse;
 import com.intern.ChatApp.entity.User;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -13,6 +14,8 @@ public interface UserService {
     List<UserResponse> getAllUsers();
 
     User getUser(int id);
+
+    UserResponse updateProfile(String name, String oldPassword, String newPassword, MultipartFile image);
 
     void disableUser(Integer userId);
 

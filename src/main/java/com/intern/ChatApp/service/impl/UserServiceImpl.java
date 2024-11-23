@@ -10,15 +10,17 @@ import com.intern.ChatApp.enums.ErrorCode;
 import com.intern.ChatApp.exception.AppException;
 import com.intern.ChatApp.repository.RoleRepository;
 import com.intern.ChatApp.repository.UserRepository;
+import com.intern.ChatApp.service.FileService;
 import com.intern.ChatApp.service.UserService;
+import com.intern.ChatApp.utils.SecurityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Controller
@@ -33,6 +35,11 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private SecurityUtil securityUtil;
+
+    @Autowired
+    private FileService fileService;
 
     public UserResponse addUser(UserRequest userRequest) {
 
@@ -62,6 +69,39 @@ public class UserServiceImpl implements UserService {
     }
 
 
+    @Override
+    @Transactional
+    public UserResponse updateProfile(String name, String oldPassword, String newPassword, MultipartFile image) {
+        User currentUser = getCurrentUser();
+
+        if (name != null && !name.isBlank()) {
+            currentUser.setName(name);
+        }
+
+        if (oldPassword != null && newPassword != null) {
+            if (!passwordEncoder.matches(oldPassword, currentUser.getPassword())) {
+                throw new AppException(ErrorCode.INVALID_CREDENTIALS);
+            }
+            currentUser.setPassword(passwordEncoder.encode(newPassword));
+        }
+
+        if (image != null && !image.isEmpty()) {
+            String filename = fileService.saveFile(image);
+            currentUser.setImagePath(filename);
+        }
+
+        currentUser.setUpdatedAt(LocalDateTime.now());
+        userRepository.save(currentUser);
+
+        return convertToUserResponse(currentUser);
+    }
+
+
+    private User getCurrentUser() {
+        String email = securityUtil.extractEmailFromSecurityContext();
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+    }
 
     @Override
     @Transactional
