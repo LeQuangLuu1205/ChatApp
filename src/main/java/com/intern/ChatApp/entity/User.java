@@ -36,6 +36,9 @@ public class User implements UserDetails {
     @Column(name = "isVerified")
     private Boolean isVerified = false;
 
+    @Column(name = "isDisabled")
+    private Boolean isDisabled = false;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 

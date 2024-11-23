@@ -69,14 +69,16 @@ public class UserController {
         return "Success update user";
     }
 
-    @DeleteMapping("/delete/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public String deleteUser(@PathVariable int id) {
-        userService.deleteUser(id);
-
-        return "Success delete user";
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<Void>> deleteUser(@PathVariable Integer id) {
+        userService.disableUser(id);
+        return ResponseEntity.ok(
+                ApiResponse.<Void>builder()
+                        .code(1000)
+                        .message("User disabled successfully")
+                        .build()
+        );
     }
-
     @PutMapping("/{userId}/roles")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<String>> assignRole(@PathVariable Integer userId, @RequestBody AssignRoleRequest request) {
