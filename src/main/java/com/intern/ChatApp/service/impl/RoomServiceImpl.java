@@ -180,29 +180,23 @@ public class RoomServiceImpl implements RoomService {
     @Transactional
     public RoomResponse removeUserFromRoom(RemoveUserFromRoomRequest request) {
 
-        // Lấy room theo roomId
         Room room = roomRepository.findById(request.getRoomId())
                 .orElseThrow(() -> new AppException(ErrorCode.ROOM_NOT_FOUND));
 
-        // Lấy user hiện tại từ SecurityContext
         String currentUserEmail = securityUtil.extractEmailFromSecurityContext();
         User currentUser = userRepository.findByEmail(currentUserEmail)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
-        // Kiểm tra quyền của người yêu cầu (creator hoặc moderator)
         RoomUser currentRoomUser = roomUserRepository.findByRoomAndUser(room, currentUser)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_IN_ROOM));
 
 
-        // Tìm user cần xóa theo email
         User userToRemove = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
-        // Kiểm tra xem người dùng có phải là thành viên của room không
         RoomUser roomUserToRemove = roomUserRepository.findByRoomAndUser(room, userToRemove)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_IN_ROOM));
 
-        // Xóa RoomUser
         roomUserRepository.delete(roomUserToRemove);
 
         return RoomResponse.builder()
@@ -250,7 +244,7 @@ public class RoomServiceImpl implements RoomService {
     }
 
     public List<RoomResponse> getAllRooms() {
-        // Fetch only rooms that are not disabled
+
         return roomRepository.findByIsDisabledFalse()
                 .stream()
                 .map(this::convertToRoomResponse)
@@ -258,10 +252,21 @@ public class RoomServiceImpl implements RoomService {
     }
 
     public List<RoomResponse> getUserRooms() {
+
         String email = securityUtil.extractEmailFromSecurityContext();
+
         return roomUserRepository.findByUserEmail(email)
                 .stream()
-                .filter(roomUser -> !roomUser.getRoom().getIsDisabled()) // Lọc room không bị vô hiệu hóa
+                .filter(roomUser -> !roomUser.getRoom().getIsDisabled())
+                .map(this::convertToRoomResponse)
+                .collect(Collectors.toList());
+    }
+
+    public List<RoomResponse> getCreatedRooms() {
+        String email = securityUtil.extractEmailFromSecurityContext();
+        return roomRepository.findByCreatedByEmail(email)
+                .stream()
+                .filter(room -> !Boolean.TRUE.equals(room.getIsDisabled()))
                 .map(this::convertToRoomResponse)
                 .collect(Collectors.toList());
     }

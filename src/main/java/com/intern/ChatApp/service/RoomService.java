@@ -21,4 +21,5 @@ public interface RoomService {
     void disableRoom(Integer roomId);
     List<RoomResponse> getAllRooms();
     List<RoomResponse> getUserRooms();
+    List<RoomResponse> getCreatedRooms();
 }
