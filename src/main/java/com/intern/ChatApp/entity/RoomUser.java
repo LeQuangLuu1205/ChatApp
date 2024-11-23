@@ -31,5 +31,4 @@ public class RoomUser {
     @Column(nullable = false, updatable = false)
     private LocalDateTime joinedAt = LocalDateTime.now();
 
-
 }

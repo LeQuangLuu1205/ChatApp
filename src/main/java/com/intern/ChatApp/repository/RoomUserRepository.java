@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface RoomUserRepository extends JpaRepository<RoomUser, RoomUserId> {
@@ -17,4 +18,7 @@ public interface RoomUserRepository extends JpaRepository<RoomUser, RoomUserId> 
             "FROM RoomUser ru " +
             "WHERE ru.room.id = :roomId AND ru.user.email = :email")
     boolean existsByRoomIdAndUserEmail(@Param("roomId") Integer roomId, @Param("email") String email);
+
+    @Query("SELECT ru FROM RoomUser ru WHERE ru.user.email = :email")
+    List<RoomUser> findByUserEmail(@Param("email") String email);
 }

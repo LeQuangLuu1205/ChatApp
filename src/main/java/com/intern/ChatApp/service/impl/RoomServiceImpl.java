@@ -257,7 +257,25 @@ public class RoomServiceImpl implements RoomService {
                 .collect(Collectors.toList());
     }
 
+    public List<RoomResponse> getUserRooms() {
+        String email = securityUtil.extractEmailFromSecurityContext();
+        return roomUserRepository.findByUserEmail(email)
+                .stream()
+                .filter(roomUser -> !roomUser.getRoom().getIsDisabled()) // Lọc room không bị vô hiệu hóa
+                .map(this::convertToRoomResponse)
+                .collect(Collectors.toList());
+    }
+
     private RoomResponse convertToRoomResponse(Room room) {
+        return RoomResponse.builder()
+                .id(room.getId())
+                .name(room.getName())
+                .createdByEmail(room.getCreatedBy() != null ? room.getCreatedBy().getEmail() : null)
+                .build();
+    }
+
+    private RoomResponse convertToRoomResponse(RoomUser roomUser) {
+        Room room = roomUser.getRoom();
         return RoomResponse.builder()
                 .id(room.getId())
                 .name(room.getName())

@@ -115,4 +115,16 @@ public class RoomController {
                         .build()
         );
     }
+
+    @GetMapping("/user-rooms")
+    public ResponseEntity<ApiResponse<List<RoomResponse>>> getUserRooms() {
+        List<RoomResponse> rooms = roomService.getUserRooms();
+        return ResponseEntity.ok(
+                ApiResponse.<List<RoomResponse>>builder()
+                        .code(1000)
+                        .message("User rooms retrieved successfully")
+                        .result(rooms)
+                        .build()
+        );
+    }
 }

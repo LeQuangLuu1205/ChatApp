@@ -20,4 +20,5 @@ public interface RoomService {
     RoomResponse updateRoomName(Integer roomId, UpdateRoomRequest request);
     void disableRoom(Integer roomId);
     List<RoomResponse> getAllRooms();
+    List<RoomResponse> getUserRooms();
 }
