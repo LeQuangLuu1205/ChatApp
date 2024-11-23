@@ -45,11 +45,6 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-    public List<Room> getRooms() {
-        return roomRepository.findAll();
-    }
-
-    @Override
     public Room getRoom(Integer id) {
         Room room = roomRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid room id" + id));
@@ -185,29 +180,23 @@ public class RoomServiceImpl implements RoomService {
     @Transactional
     public RoomResponse removeUserFromRoom(RemoveUserFromRoomRequest request) {
 
-        // Lấy room theo roomId
         Room room = roomRepository.findById(request.getRoomId())
                 .orElseThrow(() -> new AppException(ErrorCode.ROOM_NOT_FOUND));
 
-        // Lấy user hiện tại từ SecurityContext
         String currentUserEmail = securityUtil.extractEmailFromSecurityContext();
         User currentUser = userRepository.findByEmail(currentUserEmail)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
-        // Kiểm tra quyền của người yêu cầu (creator hoặc moderator)
         RoomUser currentRoomUser = roomUserRepository.findByRoomAndUser(room, currentUser)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_IN_ROOM));
 
 
-        // Tìm user cần xóa theo email
         User userToRemove = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
-        // Kiểm tra xem người dùng có phải là thành viên của room không
         RoomUser roomUserToRemove = roomUserRepository.findByRoomAndUser(room, userToRemove)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_IN_ROOM));
 
-        // Xóa RoomUser
         roomUserRepository.delete(roomUserToRemove);
 
         return RoomResponse.builder()
@@ -252,5 +241,50 @@ public class RoomServiceImpl implements RoomService {
         room.setUpdatedAt(LocalDateTime.now());
 
         roomRepository.save(room);
+    }
+
+    public List<RoomResponse> getAllRooms() {
+
+        return roomRepository.findByIsDisabledFalse()
+                .stream()
+                .map(this::convertToRoomResponse)
+                .collect(Collectors.toList());
+    }
+
+    public List<RoomResponse> getUserRooms() {
+
+        String email = securityUtil.extractEmailFromSecurityContext();
+
+        return roomUserRepository.findByUserEmail(email)
+                .stream()
+                .filter(roomUser -> !roomUser.getRoom().getIsDisabled())
+                .map(this::convertToRoomResponse)
+                .collect(Collectors.toList());
+    }
+
+    public List<RoomResponse> getCreatedRooms() {
+        String email = securityUtil.extractEmailFromSecurityContext();
+        return roomRepository.findByCreatedByEmail(email)
+                .stream()
+                .filter(room -> !Boolean.TRUE.equals(room.getIsDisabled()))
+                .map(this::convertToRoomResponse)
+                .collect(Collectors.toList());
+    }
+
+    private RoomResponse convertToRoomResponse(Room room) {
+        return RoomResponse.builder()
+                .id(room.getId())
+                .name(room.getName())
+                .createdByEmail(room.getCreatedBy() != null ? room.getCreatedBy().getEmail() : null)
+                .build();
+    }
+
+    private RoomResponse convertToRoomResponse(RoomUser roomUser) {
+        Room room = roomUser.getRoom();
+        return RoomResponse.builder()
+                .id(room.getId())
+                .name(room.getName())
+                .createdByEmail(room.getCreatedBy() != null ? room.getCreatedBy().getEmail() : null)
+                .build();
     }
 }
