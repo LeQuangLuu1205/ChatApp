@@ -26,10 +26,21 @@ public class Message {
     @Column(length = 255)
     private String fileUrl;
 
+    @Column(name = "isDisabled")
+    private Boolean isDisabled = false;
+
     private Boolean isPinned = false;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    @Column(nullable = false)
+    private LocalDateTime updatedAt = LocalDateTime.now();
+
+    @PreUpdate
+    public void setLastUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 
     @ManyToOne
     @JoinColumn(name = "room_id")

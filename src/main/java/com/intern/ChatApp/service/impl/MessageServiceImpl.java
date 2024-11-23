@@ -6,6 +6,8 @@ import com.intern.ChatApp.dto.response.UserResponse;
 import com.intern.ChatApp.entity.Message;
 import com.intern.ChatApp.entity.Room;
 import com.intern.ChatApp.entity.User;
+import com.intern.ChatApp.enums.ErrorCode;
+import com.intern.ChatApp.exception.AppException;
 import com.intern.ChatApp.repository.MessageRepository;
 import com.intern.ChatApp.repository.RoomRepository;
 import com.intern.ChatApp.repository.UserRepository;
@@ -14,6 +16,7 @@ import com.intern.ChatApp.utils.SecurityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
@@ -49,7 +52,9 @@ public class MessageServiceImpl implements MessageService {
                 .messageText(messageRequest.getMessageText())
                 .fileUrl(messageRequest.getFileUrl())
                 .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
                 .room(room)
+                .isDisabled(false)
                 .user(user)
                 .build());
         UserResponse userResponse = UserResponse.builder()
@@ -67,10 +72,21 @@ public class MessageServiceImpl implements MessageService {
                         .build();
 
 
-        if (messageRepository.save(message)==null)
-        {
-            return null;
-        }
+
         return  response;
+    }
+
+    @Override
+    @Transactional
+    public void disableMessage(Integer messageId) {
+        Message message = messageRepository.findById(messageId)
+                .orElseThrow(() -> new AppException(ErrorCode.MESSAGE_NOT_FOUND));
+
+        boolean currentState = Boolean.TRUE.equals(message.getIsDisabled());
+        message.setIsDisabled(!currentState);
+
+        message.setUpdatedAt(LocalDateTime.now());
+
+        messageRepository.save(message);
     }
 }
