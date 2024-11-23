@@ -107,11 +107,15 @@ public class RoomController {
                 .build());
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public String deleteRoom(@PathVariable Integer id){
-        roomService.deleteRoom(id);
-
-        return "Success delete room";
+    public ResponseEntity<ApiResponse<Void>> deleteRoom(@PathVariable Integer id) {
+        roomService.disableRoom(id);
+        return ResponseEntity.ok(
+                ApiResponse.<Void>builder()
+                        .code(1000)
+                        .message("Room disabled successfully")
+                        .build()
+        );
     }
 }

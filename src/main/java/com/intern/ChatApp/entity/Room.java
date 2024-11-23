@@ -18,6 +18,9 @@ public class Room {
     @Column(nullable = false, length = 100)
     private String name;
 
+    @Column(name = "isDisabled")
+    private Boolean isDisabled = false;
+
     @ManyToOne
     @JoinColumn(name = "created_by_moderate_user_id")
     private User createdBy;
