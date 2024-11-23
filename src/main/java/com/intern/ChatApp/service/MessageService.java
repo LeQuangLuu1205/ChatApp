@@ -5,6 +5,7 @@ import com.intern.ChatApp.dto.response.MessageResponse;
 
 public interface MessageService {
     void disableMessage(Integer messageId);
+    MessageResponse pinMessage(Integer messageId);
     void sendMessage(MessageRequest messageRequest, Integer roomId);
     public MessageResponse saveMessageToDatabase(MessageRequest messageRequest,Integer roomId);
 }

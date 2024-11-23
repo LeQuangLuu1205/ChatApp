@@ -89,4 +89,31 @@ public class MessageServiceImpl implements MessageService {
 
         messageRepository.save(message);
     }
+
+    @Override
+    @Transactional
+    public MessageResponse pinMessage(Integer messageId) {
+        Message message = messageRepository.findById(messageId)
+                .orElseThrow(() -> new AppException(ErrorCode.MESSAGE_NOT_FOUND));
+
+        if (Boolean.TRUE.equals(message.getIsDisabled())) {
+            throw new AppException(ErrorCode.MESSAGE_DISABLED);
+        }
+
+        Room room = message.getRoom();
+
+        messageRepository.unpinMessagesInRoom(room.getId());
+
+        message.setIsPinned(true);
+        message.setUpdatedAt(LocalDateTime.now());
+        messageRepository.save(message);
+
+        return MessageResponse.builder()
+                .id(message.getId())
+                .messageText(message.getMessageText())
+                .fileUrl(message.getFileUrl())
+                .isPinned(message.getIsPinned())
+                .createdAt(message.getCreatedAt())
+                .build();
+    }
 }
