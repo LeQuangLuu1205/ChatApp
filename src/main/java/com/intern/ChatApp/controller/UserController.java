@@ -1,6 +1,7 @@
 package com.intern.ChatApp.controller;
 
 import com.intern.ChatApp.dto.request.AssignRoleRequest;
+import com.intern.ChatApp.dto.request.SendPasswordRequest;
 import com.intern.ChatApp.dto.request.UserRequest;
 import com.intern.ChatApp.dto.response.ApiResponse;
 import com.intern.ChatApp.dto.response.UserResponse;
@@ -101,5 +102,12 @@ public class UserController {
         UserResponse updatedUser = userService.updateProfile(name, oldPassword, newPassword, image);
 
         return ResponseEntity.ok(new ApiResponse<>(1000, "Profile updated successfully", updatedUser));
+    }
+
+    @PostMapping("/send-password")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<String>> resetPassword(@Valid @RequestBody SendPasswordRequest request) {
+        userService.resetPassword(request.getEmail());
+        return ResponseEntity.ok(new ApiResponse<>(1000, "Mật khẩu mới đã được gửi đến email của bạn.",null));
     }
 }

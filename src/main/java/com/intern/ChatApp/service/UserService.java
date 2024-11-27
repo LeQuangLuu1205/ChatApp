@@ -22,4 +22,5 @@ public interface UserService {
     void updateUser(int id,User user);
 
     void assignRole(Integer userId,AssignRoleRequest request);
+    void resetPassword(String email);
 }
