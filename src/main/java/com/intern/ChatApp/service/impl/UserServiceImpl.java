@@ -109,6 +109,29 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserResponse getCurrent() {
+        String currentUserEmail = securityUtil.extractEmailFromSecurityContext();
+        User user = userRepository.findByEmail(currentUserEmail)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        RoleResponse roleResponse = new RoleResponse(
+                user.getRole().getId(),
+                user.getRole().getRoleName());
+
+        return new UserResponse(
+                user.getId(),
+                user.getEmail(),
+                user.getName(),
+                user.getImagePath(),
+                user.getCreatedAt(),
+                user.getUpdatedAt(),
+                user.getIsDisabled(),
+                roleResponse
+        );
+
+    }
+
+    @Override
     @Transactional
     public List<UserResponse> getAllUsers() {
         return userRepository.findAll()

@@ -110,4 +110,10 @@ public class UserController {
         userService.resetPassword(request.getEmail());
         return ResponseEntity.ok(new ApiResponse<>(1000, "Mật khẩu mới đã được gửi đến email của bạn.",null));
     }
+
+    @GetMapping("/me")
+    public ResponseEntity<ApiResponse<UserResponse>> getCurrentUser() {
+        UserResponse userResponse = userService.getCurrent();
+        return ResponseEntity.ok(new ApiResponse<>(1000,"Thông tin tài khoản hiện tại",userResponse));
+    }
 }

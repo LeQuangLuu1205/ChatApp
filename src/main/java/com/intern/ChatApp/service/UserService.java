@@ -23,4 +23,5 @@ public interface UserService {
 
     void assignRole(Integer userId,AssignRoleRequest request);
     void resetPassword(String email);
+    UserResponse getCurrent();
 }
