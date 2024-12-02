@@ -4,7 +4,9 @@ import com.intern.ChatApp.dto.request.AddUserToRoomRequest;
 import com.intern.ChatApp.dto.request.CreateRoomRequest;
 import com.intern.ChatApp.dto.request.RemoveUserFromRoomRequest;
 import com.intern.ChatApp.dto.request.UpdateRoomRequest;
+import com.intern.ChatApp.dto.response.RoleResponse;
 import com.intern.ChatApp.dto.response.RoomResponse;
+import com.intern.ChatApp.dto.response.UserResponse;
 import com.intern.ChatApp.entity.Room;
 import com.intern.ChatApp.entity.RoomUser;
 import com.intern.ChatApp.entity.User;
@@ -296,5 +298,34 @@ public class RoomServiceImpl implements RoomService {
                         room.getName(),
                         room.getCreatedBy().getEmail()))
                 .orElse(null);
+    }
+
+    @Override
+    public List<UserResponse> getUsersInRoom(Integer roomId) {
+        // Kiểm tra nếu roomId có tồn tại
+        Room room = roomRepository.findById(roomId).orElseThrow(() -> new RuntimeException("Room not found"));
+
+        // Lấy danh sách người dùng trong phòng từ bảng room_users
+        List<RoomUser> roomUsers = roomUserRepository.findByRoom(room);
+
+        // Chuyển danh sách RoomUser thành danh sách UserResponse
+        return roomUsers.stream()
+                .map(roomUser -> {
+                    UserResponse userResponse = new UserResponse();
+                    userResponse.setId(roomUser.getUser().getId());
+                    userResponse.setEmail(roomUser.getUser().getEmail());
+                    userResponse.setName(roomUser.getUser().getName());
+                    userResponse.setImagePath(roomUser.getUser().getImagePath());
+                    userResponse.setCreatedAt(roomUser.getUser().getCreatedAt());
+                    userResponse.setUpdatedAt(roomUser.getUser().getUpdatedAt());
+                    userResponse.setIsDisabled(roomUser.getUser().getIsDisabled());
+                    userResponse.setRoleResponse(
+                            new RoleResponse(
+                                    roomUser.getUser().getRole().getId(),
+                                    roomUser.getUser().getRole().getRoleName()));
+
+                    return userResponse;
+                })
+                .collect(Collectors.toList());
     }
 }

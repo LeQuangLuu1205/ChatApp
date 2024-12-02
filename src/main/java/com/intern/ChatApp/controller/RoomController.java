@@ -6,6 +6,7 @@ import com.intern.ChatApp.dto.request.RemoveUserFromRoomRequest;
 import com.intern.ChatApp.dto.request.UpdateRoomRequest;
 import com.intern.ChatApp.dto.response.ApiResponse;
 import com.intern.ChatApp.dto.response.RoomResponse;
+import com.intern.ChatApp.dto.response.UserResponse;
 import com.intern.ChatApp.entity.Room;
 import com.intern.ChatApp.service.RoomService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -137,6 +138,16 @@ public class RoomController {
                         .code(1000)
                         .message("Rooms created by user retrieved successfully")
                         .result(rooms)
+                        .build()
+        );
+    }
+    @GetMapping("/{roomId}/users")
+    public ResponseEntity<ApiResponse<List<UserResponse>>> getUsersInRoom(@PathVariable Integer roomId) {
+        return ResponseEntity.ok(
+                ApiResponse.<List<UserResponse>>builder()
+                        .code(1000)
+                        .message("Rooms created by user retrieved successfully")
+                        .result(roomService.getUsersInRoom(roomId))
                         .build()
         );
     }
