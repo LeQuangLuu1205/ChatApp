@@ -22,4 +22,5 @@ public interface RoomService {
     List<RoomResponse> getAllRooms();
     List<RoomResponse> getUserRooms();
     List<RoomResponse> getCreatedRooms();
+    RoomResponse getRoomById(Integer groupId);
 }

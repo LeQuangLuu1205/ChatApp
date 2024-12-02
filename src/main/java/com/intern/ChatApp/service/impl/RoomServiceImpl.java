@@ -287,4 +287,14 @@ public class RoomServiceImpl implements RoomService {
                 .createdByEmail(room.getCreatedBy() != null ? room.getCreatedBy().getEmail() : null)
                 .build();
     }
+
+    @Override
+    public RoomResponse getRoomById(Integer groupId) {
+        return roomRepository.findById(groupId)
+                .map(room -> new RoomResponse(
+                        room.getId(),
+                        room.getName(),
+                        room.getCreatedBy().getEmail()))
+                .orElse(null);
+    }
 }

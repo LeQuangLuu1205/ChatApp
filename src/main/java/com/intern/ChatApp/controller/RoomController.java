@@ -82,13 +82,14 @@ public class RoomController {
 
 
 
-    @GetMapping("/get")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ApiResponse<?> getRoomById(@RequestParam Integer id){
-        Room room = roomService.getRoom(id);
-
-        return ApiResponse.builder()
-                .result(room).build();
+    @PreAuthorize("hasAnyRole('ADMIN','MODERATOR','NORMAL')")
+    @GetMapping("/{groupId}")
+    public ResponseEntity<ApiResponse<RoomResponse>> getRoomById(@PathVariable Integer groupId) {
+        RoomResponse roomResponse = roomService.getRoomById(groupId);
+        return ResponseEntity.ok(ApiResponse.<RoomResponse>builder()
+                .result(roomResponse)
+                .message("Get room successfully")
+                .build());
     }
 
     @PutMapping("/{roomId}")
