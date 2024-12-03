@@ -125,7 +125,7 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public List<MessageResponse> getMessagesByRoomId(Integer roomId) {
         // Lấy danh sách tin nhắn theo roomId
-        List<Message> messages = messageRepository.findByRoom_Id(roomId);
+        List<Message> messages = messageRepository.findAllByRoom_IdAndIsDisabledFalseOrderByCreatedAtAsc(roomId);
 
         // Chuyển đổi sang MessageResponse
         return messages.stream()

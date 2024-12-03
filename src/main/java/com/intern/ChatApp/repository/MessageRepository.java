@@ -18,4 +18,5 @@ public interface MessageRepository extends JpaRepository<Message, Integer> {
     void unpinMessagesInRoom(@Param("roomId") Integer roomId);
 
     List<Message> findAllByRoom_IdAndIsDisabledFalseOrderByCreatedAtAsc(Integer roomId);
+    List<Message> findByRoom_IdAndIsDisabledFalse(Integer roomId);
 }
