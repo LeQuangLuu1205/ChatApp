@@ -30,7 +30,9 @@ public class WebSocketController {
         messageRequest.setEmail(email);
 
         if (messageRequest.getImageBase64() != null && !messageRequest.getImageBase64().isEmpty()) {
-            String imageUrl = imageService.saveImageFromBase64(messageRequest.getImageBase64());
+//            String imageUrl = imageService.saveImageFromBase64(messageRequest.getImageBase64());
+            String imageUrl = imageService.saveFileFromBase64(messageRequest.getImageBase64());
+
             messageRequest.setFileUrl(imageUrl);
         }
 
