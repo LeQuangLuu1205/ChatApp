@@ -53,7 +53,7 @@ public class CustomFilterSecurity {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session ->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers("/api/auth/**","/ws/**","/uploads/**","/profile/**").permitAll()
+                        .requestMatchers("/api/auth/**","/ws/**","/uploads/**","/profile/**","/download/**").permitAll()
                         .requestMatchers("/api/rooms/**").hasAnyRole("ADMIN", "MODERATOR","NORMAL")
                         .requestMatchers("/api/users/**").hasAnyRole("ADMIN","MODERATOR","NORMAL")
                         .requestMatchers("/api/messages/**").hasAnyRole("ADMIN","MODERATOR","NORMAL")

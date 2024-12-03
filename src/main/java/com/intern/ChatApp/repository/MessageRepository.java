@@ -12,7 +12,10 @@ import java.util.List;
 @Repository
 public interface MessageRepository extends JpaRepository<Message, Integer> {
     List<Message> findByRoomId(Integer roomId);
+    List<Message> findByRoom_Id(Integer roomId);
     @Modifying
     @Query("UPDATE Message m SET m.isPinned = false WHERE m.room.id = :roomId AND m.isPinned = true")
     void unpinMessagesInRoom(@Param("roomId") Integer roomId);
+
+    List<Message> findAllByRoom_IdAndIsDisabledFalseOrderByCreatedAtAsc(Integer roomId);
 }
