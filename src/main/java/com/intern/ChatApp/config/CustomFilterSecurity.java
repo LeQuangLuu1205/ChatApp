@@ -44,7 +44,7 @@ public class CustomFilterSecurity {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.cors(cors -> cors.configurationSource(request -> {
                     CorsConfiguration configuration = new CorsConfiguration();
-                    configuration.setAllowedOrigins(Arrays.asList("http://127.0.0.1:5500","http://localhost:5500","http://localhost:3000"));
+                    configuration.setAllowedOrigins(Arrays.asList("http://127.0.0.1:5500","http://localhost:5500","http://localhost:3000","http://localhost:3001"));
                     configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
                     configuration.setAllowedHeaders(Arrays.asList("*"));
                     configuration.setAllowCredentials(true);;
@@ -53,7 +53,7 @@ public class CustomFilterSecurity {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session ->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers("/api/auth/**","/ws/**","/uploads/**").permitAll()
+                        .requestMatchers("/api/auth/**","/ws/**","/uploads/**","/profile/**","/download/**").permitAll()
                         .requestMatchers("/api/rooms/**").hasAnyRole("ADMIN", "MODERATOR","NORMAL")
                         .requestMatchers("/api/users/**").hasAnyRole("ADMIN","MODERATOR","NORMAL")
                         .requestMatchers("/api/messages/**").hasAnyRole("ADMIN","MODERATOR","NORMAL")

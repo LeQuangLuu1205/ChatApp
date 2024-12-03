@@ -6,6 +6,7 @@ import com.intern.ChatApp.dto.request.RemoveUserFromRoomRequest;
 import com.intern.ChatApp.dto.request.UpdateRoomRequest;
 import com.intern.ChatApp.dto.response.ApiResponse;
 import com.intern.ChatApp.dto.response.RoomResponse;
+import com.intern.ChatApp.dto.response.UserResponse;
 import com.intern.ChatApp.entity.Room;
 import com.intern.ChatApp.service.RoomService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,13 +83,14 @@ public class RoomController {
 
 
 
-    @GetMapping("/get")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ApiResponse<?> getRoomById(@RequestParam Integer id){
-        Room room = roomService.getRoom(id);
-
-        return ApiResponse.builder()
-                .result(room).build();
+    @PreAuthorize("hasAnyRole('ADMIN','MODERATOR','NORMAL')")
+    @GetMapping("/{groupId}")
+    public ResponseEntity<ApiResponse<RoomResponse>> getRoomById(@PathVariable Integer groupId) {
+        RoomResponse roomResponse = roomService.getRoomById(groupId);
+        return ResponseEntity.ok(ApiResponse.<RoomResponse>builder()
+                .result(roomResponse)
+                .message("Get room successfully")
+                .build());
     }
 
     @PutMapping("/{roomId}")
@@ -136,6 +138,16 @@ public class RoomController {
                         .code(1000)
                         .message("Rooms created by user retrieved successfully")
                         .result(rooms)
+                        .build()
+        );
+    }
+    @GetMapping("/{roomId}/users")
+    public ResponseEntity<ApiResponse<List<UserResponse>>> getUsersInRoom(@PathVariable Integer roomId) {
+        return ResponseEntity.ok(
+                ApiResponse.<List<UserResponse>>builder()
+                        .code(1000)
+                        .message("Rooms created by user retrieved successfully")
+                        .result(roomService.getUsersInRoom(roomId))
                         .build()
         );
     }

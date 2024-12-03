@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/messages")
 @RequiredArgsConstructor
@@ -37,6 +39,17 @@ public class MessageController {
                         .code(1000)
                         .message("Message pinned successfully")
                         .result(pinnedMessage)
+                        .build()
+        );
+    }
+
+    @GetMapping("/room/{roomId}")
+    public ResponseEntity<ApiResponse<List<MessageResponse>>> getMessagesByRoom(@PathVariable Integer roomId) {
+        return ResponseEntity.ok(
+                ApiResponse.<List<MessageResponse>>builder()
+                        .code(1000)
+                        .message("Message pinned successfully")
+                        .result(messageService.getMessagesByRoomId(roomId))
                         .build()
         );
     }

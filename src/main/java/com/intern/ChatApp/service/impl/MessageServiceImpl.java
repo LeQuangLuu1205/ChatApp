@@ -8,6 +8,7 @@ import com.intern.ChatApp.entity.Room;
 import com.intern.ChatApp.entity.User;
 import com.intern.ChatApp.enums.ErrorCode;
 import com.intern.ChatApp.exception.AppException;
+import com.intern.ChatApp.mapper.MessageMapper;
 import com.intern.ChatApp.repository.MessageRepository;
 import com.intern.ChatApp.repository.RoomRepository;
 import com.intern.ChatApp.repository.UserRepository;
@@ -19,6 +20,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -34,6 +37,8 @@ public class MessageServiceImpl implements MessageService {
     private MessageRepository messageRepository;
     @Autowired
     private SecurityUtil securityUtil;
+    @Autowired
+    private MessageMapper messageMapper;
     @Override
     public void sendMessage(MessageRequest messageRequest, Integer roomId) {
         kafkaTemplate.send("chat-room-" + roomId, messageRequest);
@@ -115,5 +120,16 @@ public class MessageServiceImpl implements MessageService {
                 .isPinned(message.getIsPinned())
                 .createdAt(message.getCreatedAt())
                 .build();
+    }
+
+    @Override
+    public List<MessageResponse> getMessagesByRoomId(Integer roomId) {
+        // Lấy danh sách tin nhắn theo roomId
+        List<Message> messages = messageRepository.findAllByRoom_IdAndIsDisabledFalseOrderByCreatedAtAsc(roomId);
+
+        // Chuyển đổi sang MessageResponse
+        return messages.stream()
+                .map(messageMapper::toMessageResponse)
+                .collect(Collectors.toList());
     }
 }

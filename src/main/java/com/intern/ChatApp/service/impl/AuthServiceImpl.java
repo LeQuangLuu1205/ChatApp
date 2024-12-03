@@ -5,10 +5,7 @@ import com.intern.ChatApp.dto.request.IntrospectRequest;
 import com.intern.ChatApp.dto.request.LoginRequest;
 import com.intern.ChatApp.dto.request.LogoutRequest;
 import com.intern.ChatApp.dto.request.RegisterRequest;
-import com.intern.ChatApp.dto.response.ApiResponse;
-import com.intern.ChatApp.dto.response.AuthenticationResponse;
-import com.intern.ChatApp.dto.response.IntrospectResponse;
-import com.intern.ChatApp.dto.response.UserResponse;
+import com.intern.ChatApp.dto.response.*;
 import com.intern.ChatApp.entity.InvalidatedToken;
 import com.intern.ChatApp.entity.Role;
 import com.intern.ChatApp.entity.User;
@@ -32,6 +29,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Service
@@ -120,9 +118,23 @@ public class AuthServiceImpl implements AuthService {
                 throw new AppException(ErrorCode.UNVERIFIED_ACCOUNT);
             }
 
+            UserResponse userResponse = new UserResponse(
+                    user.getId(),
+                    user.getEmail(),
+                    user.getName(),
+                    user.getImagePath(),
+                    user.getCreatedAt(),
+                    user.getCreatedAt(),
+                    user.getIsDisabled(),
+                    new RoleResponse(user.getRole().getId(), user.getRole().getRoleName())
+            );
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
             var token = jwtUtils.generateToken(userDetails);
-            return AuthenticationResponse.builder().token(token).authenticated(true).build();
+            return AuthenticationResponse.builder().
+                    token(token)
+                    .authenticated(true)
+                    .userResponse(userResponse)
+                    .build();
         } catch (BadCredentialsException e) {
             throw new AppException(ErrorCode.INVALID_CREDENTIALS);
         }

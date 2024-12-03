@@ -5,6 +5,7 @@ import com.intern.ChatApp.dto.request.CreateRoomRequest;
 import com.intern.ChatApp.dto.request.RemoveUserFromRoomRequest;
 import com.intern.ChatApp.dto.request.UpdateRoomRequest;
 import com.intern.ChatApp.dto.response.RoomResponse;
+import com.intern.ChatApp.dto.response.UserResponse;
 import com.intern.ChatApp.entity.Room;
 
 import java.util.List;
@@ -22,4 +23,6 @@ public interface RoomService {
     List<RoomResponse> getAllRooms();
     List<RoomResponse> getUserRooms();
     List<RoomResponse> getCreatedRooms();
+    RoomResponse getRoomById(Integer groupId);
+    List<UserResponse> getUsersInRoom(Integer roomId);
 }

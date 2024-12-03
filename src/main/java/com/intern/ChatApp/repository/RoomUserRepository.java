@@ -21,4 +21,5 @@ public interface RoomUserRepository extends JpaRepository<RoomUser, RoomUserId> 
 
     @Query("SELECT ru FROM RoomUser ru WHERE ru.user.email = :email")
     List<RoomUser> findByUserEmail(@Param("email") String email);
+    List<RoomUser> findByRoom(Room room);
 }

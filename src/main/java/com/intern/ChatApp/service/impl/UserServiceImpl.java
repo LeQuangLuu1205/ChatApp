@@ -10,6 +10,7 @@ import com.intern.ChatApp.enums.ErrorCode;
 import com.intern.ChatApp.exception.AppException;
 import com.intern.ChatApp.repository.RoleRepository;
 import com.intern.ChatApp.repository.UserRepository;
+import com.intern.ChatApp.service.EmailService;
 import com.intern.ChatApp.service.FileService;
 import com.intern.ChatApp.service.UserService;
 import com.intern.ChatApp.utils.SecurityUtil;
@@ -21,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 @Controller
@@ -40,6 +42,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private FileService fileService;
+
+    @Autowired
+    private EmailService emailService;
 
     public UserResponse addUser(UserRequest userRequest) {
 
@@ -104,6 +109,29 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserResponse getCurrent() {
+        String currentUserEmail = securityUtil.extractEmailFromSecurityContext();
+        User user = userRepository.findByEmail(currentUserEmail)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        RoleResponse roleResponse = new RoleResponse(
+                user.getRole().getId(),
+                user.getRole().getRoleName());
+
+        return new UserResponse(
+                user.getId(),
+                user.getEmail(),
+                user.getName(),
+                user.getImagePath(),
+                user.getCreatedAt(),
+                user.getUpdatedAt(),
+                user.getIsDisabled(),
+                roleResponse
+        );
+
+    }
+
+    @Override
     @Transactional
     public List<UserResponse> getAllUsers() {
         return userRepository.findAll()
@@ -159,5 +187,35 @@ public class UserServiceImpl implements UserService {
 
         user.setRole(newRole);
         userRepository.save(user);
+    }
+
+    @Transactional
+    @Override
+    public void resetPassword(String email) {
+        // Tìm người dùng theo email
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        // Tạo mật khẩu mới ngẫu nhiên
+        String newPassword = generateRandomPassword(8);
+
+        // Mã hóa mật khẩu và lưu vào DB
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+        // Gửi mật khẩu mới qua email
+        String subject = "Yêu cầu reset mật khẩu";
+        String content = "Mật khẩu mới của bạn là: " + newPassword;
+        emailService.sendEmail(user.getEmail(), subject, content);
+    }
+
+    // Hàm tạo mật khẩu ngẫu nhiên
+    private String generateRandomPassword(int length) {
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        Random random = new Random();
+        StringBuilder password = new StringBuilder();
+        for (int i = 0; i < length; i++) {
+            password.append(chars.charAt(random.nextInt(chars.length())));
+        }
+        return password.toString();
     }
 }
