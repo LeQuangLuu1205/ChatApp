@@ -49,7 +49,8 @@ public class PasswordServiceImpl implements PasswordService {
         resetToken.setExpiresAt(LocalDateTime.now().plusHours(5));
         resetTokenRepository.save(resetToken);
 
-        String resetLink = "http://127.0.0.1:5500/reset-password.html?token=" + resetTokenValue;
+//        String resetLink = "http://127.0.0.1:5500/reset-password.html?token=" + resetTokenValue;
+        String resetLink = "http://localhost:3000/reset-password?token=" + resetTokenValue;
         emailService.sendEmail(
                 user.getEmail(),
                 "Password Reset Request",

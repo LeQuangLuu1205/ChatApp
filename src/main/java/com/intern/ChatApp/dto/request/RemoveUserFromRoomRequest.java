@@ -5,5 +5,5 @@ import lombok.Data;
 @Data
 public class RemoveUserFromRoomRequest {
     private Integer roomId;
-    private String email;
+    private Integer userId;
 }

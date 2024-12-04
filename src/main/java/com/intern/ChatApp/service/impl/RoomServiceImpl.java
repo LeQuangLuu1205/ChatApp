@@ -193,7 +193,7 @@ public class RoomServiceImpl implements RoomService {
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_IN_ROOM));
 
 
-        User userToRemove = userRepository.findByEmail(request.getEmail())
+        User userToRemove = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
         RoomUser roomUserToRemove = roomUserRepository.findByRoomAndUser(room, userToRemove)
