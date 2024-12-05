@@ -52,7 +52,7 @@ public class RoomController {
                 .build());
     }
 
-    @PostMapping("/remove-user")
+    @DeleteMapping("/remove-user")
     @PreAuthorize("hasAnyRole('MODERATOR','ADMIN')")
     public ResponseEntity<ApiResponse<RoomResponse>> removeUserFromRoom(@RequestBody RemoveUserFromRoomRequest request) {
         RoomResponse roomResponse = roomService.removeUserFromRoom(request);
@@ -107,7 +107,7 @@ public class RoomController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','MODERATOR')")
     public ResponseEntity<ApiResponse<Void>> deleteRoom(@PathVariable Integer id) {
         roomService.disableRoom(id);
         return ResponseEntity.ok(
