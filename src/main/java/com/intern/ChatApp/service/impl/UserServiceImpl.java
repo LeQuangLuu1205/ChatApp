@@ -15,6 +15,10 @@ import com.intern.ChatApp.service.FileService;
 import com.intern.ChatApp.service.UserService;
 import com.intern.ChatApp.utils.SecurityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -71,6 +75,12 @@ public class UserServiceImpl implements UserService {
                         user.getRole().getId()
                         ,user.getRole().getRoleName()))
                 .build();
+    }
+
+    @Override
+    public Page<UserResponse> getAllUsers(int page, int size, String[] sort) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sort[0]).ascending());
+        return userRepository.findAllByIsDisabledFalse(pageable).map(this::convertToUserResponse);
     }
 
 
@@ -131,15 +141,8 @@ public class UserServiceImpl implements UserService {
 
     }
 
-    @Override
-    @Transactional
-    public List<UserResponse> getAllUsers() {
-        return userRepository.findAll()
-                .stream()
-                .filter(user -> Boolean.FALSE.equals(user.getIsDisabled())) // Lọc user không bị xóa
-                .map(this::convertToUserResponse)
-                .collect(Collectors.toList());
-    }
+
+
 
     private UserResponse convertToUserResponse(User user) {
         return UserResponse.builder()

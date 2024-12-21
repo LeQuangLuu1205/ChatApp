@@ -9,6 +9,10 @@ import com.intern.ChatApp.entity.User;
 import com.intern.ChatApp.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -34,18 +38,6 @@ public class UserController {
                 ApiResponse.<UserResponse>builder()
                         .message("User has been added successfully.")
                         .result(userResponse)
-                        .build()
-        );
-    }
-
-    @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN','MODERATOR')")
-    public ResponseEntity<ApiResponse<List<UserResponse>>> getAllUsers() {
-        List<UserResponse> users = userService.getAllUsers();
-        return ResponseEntity.ok(
-                ApiResponse.<List<UserResponse>>builder()
-                        .message("User list fetched successfully.")
-                        .result(users)
                         .build()
         );
     }
@@ -115,5 +107,17 @@ public class UserController {
     public ResponseEntity<ApiResponse<UserResponse>> getCurrentUser() {
         UserResponse userResponse = userService.getCurrent();
         return ResponseEntity.ok(new ApiResponse<>(1000,"Thông tin tài khoản hiện tại",userResponse));
+    }
+
+    @GetMapping()
+    @PreAuthorize("hasAnyRole('ADMIN','MODERATOR')")
+    public ApiResponse<Page<UserResponse>> getAllUsers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id,asc") String[] sort) {
+
+        Page<UserResponse> list = userService.getAllUsers(page, size, sort);
+
+        return new ApiResponse<>(1000, "Lấy danh sách thành công", list);
     }
 }
