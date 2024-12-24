@@ -31,17 +31,14 @@ public class JwtUtilsHelper {
         return new SecretKeySpec(keyBytes, 0, keyBytes.length, "HmacSHA256");
     }
 
-    // Lấy username từ JWT
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
-    // Lấy expiration date từ JWT
     public Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
     }
 
-    // Lấy bất kỳ claim nào từ JWT
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
 
@@ -60,14 +57,12 @@ public class JwtUtilsHelper {
         return extractExpiration(token).before(new Date());
     }
 
-    // Tạo token từ UserDetails
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
 
         return createToken(claims, userDetails.getUsername());
     }
 
-    // Tạo token với subject và expiration
     private String createToken(Map<String, Object> claims, String subject) {
         return Jwts.builder()
                 .setClaims(claims)
@@ -80,7 +75,6 @@ public class JwtUtilsHelper {
                 .compact();
     }
 
-    // Xác thực token
     public Boolean validateToken(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
         if (username == null || !username.equals(userDetails.getUsername()) || isTokenExpired(token)) {
